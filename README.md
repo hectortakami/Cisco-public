@@ -1,49 +1,3 @@
-# **Notes**
-
-**Show vs Debug:**
-
-- **Show:** Command as "show running-config" presents a snapshot of time of the particular configuration at that time
-- **Debug:** By the other hand, a "debug" command will prompt every change made once it starts to present any log
-
-**NetConf OSX Commands**
-
-- Windows
-  - Display network addressing and configurations
-    ```
-    C:> ipconfig /all
-    ```
-  - DHCP binding (remove leased IP and assing another)
-    ```
-    C:> ipconfig /release
-    C:> ipconfig /renew
-    ```
-  - Display/Flush ARP Table
-    ```
-    C:> arp -a
-    ```
-    ```
-    C:> arp -d
-    ```
-- Unix & Linux
-
-  - Display network addressing and configurations
-
-    ```
-    $ ifconfig
-
-    !# In modern Linux the command is:
-    $ ip address show
-    ```
-
-  - Display rounting info (default gateway)
-
-    ```
-    $ netstat -rn
-
-    !# In modern Linux the command is:
-    $ ip route show
-    ```
-
 # **Device Management**
 
 **Basic device setup**
@@ -1471,3 +1425,49 @@ _In traditional networking infrastructures the devices manage their own data and
 
 - **APIC**: Application Policy Infrastructure Controller. Designed to **manage data center** environments with Nexus Switches. Uses Cisco ACI.
 - **DNA Center (legacy APIC-EM)**: Enterprise Module. Designed to manage enterprise environments such as campus, branch and WAN. Runs on **Cisco UCN**. **Intent Based Networking (IBN)** defining Application Policies for QoS assurance from a dashboard that manage globally configurations and monitors the network.
+
+# **Notes**
+
+**Show vs Debug:**
+
+- **Show:** Command as "show running-config" presents a snapshot of time of the particular configuration at that time
+- **Debug:** By the other hand, a "debug" command will prompt every change made once it starts to present any log
+
+**NetConf OSX Commands**
+
+- Windows
+  - Display network addressing and configurations
+    ```
+    C:> ipconfig /all
+    ```
+  - DHCP binding (remove leased IP and assing another)
+    ```
+    C:> ipconfig /release
+    C:> ipconfig /renew
+    ```
+  - Display/Flush ARP Table
+    ```
+    C:> arp -a
+    ```
+    ```
+    C:> arp -d
+    ```
+- Unix & Linux
+
+  - Display network addressing and configurations
+
+    ```
+    $ ifconfig
+
+    !# In modern Linux the command is:
+    $ ip address show
+    ```
+
+  - Display rounting info (default gateway)
+
+    ```
+    $ netstat -rn
+
+    !# In modern Linux the command is:
+    $ ip route show
+    ```
