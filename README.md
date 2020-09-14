@@ -459,11 +459,17 @@ _Enhanced Interior Gateway Routing Protocol (EIGRP), **only supported on Cisco d
 ```
 
 ```
+!# Router EIGRP process level
 (config)# router eigrp [autonomous_system]
 (config-router)# eigrp router-id [router_id]          !# Manual Router-ID assignation
 (config-router)# network [network_to_advertise] [wildcard]
 (config-router)# default-information originate        !# Default routes injection
 (config-router)# redistribute {static | ospf | rip}   !# Specific routes injection from other protocols
+
+# Interface level EIGRP
+(config)# interface {gigabit | ethernet} {0-X}/{0-X}
+(config-if)# ip hello-time eigrp [autonomous_system] [secs]
+(config-if)# ip hold-interval eigrp [autonomous_system] [secs]
 ```
 
 _**Adjacency Requirements:** All **k values** and **autonomous system** must match in routers, so EIGRP can know and advertise networks_
@@ -686,7 +692,7 @@ _We can defined the router that can be active by modifying its **priority (defau
 
 ```
 !# Displays VIP information & active/standby assignation
-# show standby
+# show standby {brief | neighbors}?
 ```
 
 ```
@@ -695,6 +701,7 @@ _We can defined the router that can be active by modifying its **priority (defau
 (config-if)# standby [hsrp_id] ip [vip_address]   !# Virtual address EQUAL in both routers
 (config-if)# standby [fhrp_id] priority [priority]
 (config-if)# standby [fhrp_id] preempt            !# USE ONLY in the router you want to convert active with HIGHEST PRIORITY
+(config-if)# standby [hsrp_id] authentication md5 key-string [password] !# Authenticates MD5 without key-chain
 (config-if)# no shutdown
 ```
 
