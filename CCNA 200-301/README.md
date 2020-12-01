@@ -1478,3 +1478,15 @@ _In traditional networking infrastructures the devices manage their own data and
     !# In modern Linux the command is:
     $ ip route show
     ```
+
+\w*-?\w*(?=>|#|\()
+config(?=\))
+Enter configuration commands, one per line. End with CNTL/Z.
+(Interface|IP-Address|OK\?|Method Status|Protocol)
+Ambiguous command:
+(>|\(|\)|\*|\.|\%|\#|\:|\,|\"|\?|RETURN)
+(Ethernet|Serial|\bup|interface|\/|serial|ethernet)
+\d+
+(Unrecognized command)
+Invalid input detected at '^' marker
+.\*
