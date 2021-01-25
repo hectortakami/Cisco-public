@@ -5,25 +5,25 @@
 **Basic device setup**
 
 ```
-!# Device name
+!!! Device name
 (config)# hostname [hostname]
 
-!# Encrypted Privileged EXEC mode password
+!!! Encrypted Privileged EXEC mode password
 (config)# enable secret [password]
 
-!# Encrypt Running Config passwords
+!!! Encrypt Running Config passwords
 (config)# service password-encryption
 
-!# Display a prevention access message (when CLI prompts)
+!!! Display a prevention access message (when CLI prompts)
 (config)# banner login $[Message_goes_here]$
 
-!# Display welcome message (after user EXEC mode login)
+!!! Display welcome message (after user EXEC mode login)
 (config)# banner motd $[Message_goes_here]$
 
-!# Disable DNS translation lookup
+!!! Disable DNS translation lookup
 (config)# no ip domain-lookup
 
-!# Minimun password length allowed
+!!! Minimun password length allowed
 (config)# security passwords min-length 12
 ```
 
@@ -31,17 +31,17 @@
 _**IMPORTANT:** Configure correctly in all devices so, **certificates**, **protocols** and **syslog** can be running correctly. The **convergence in NTP servers, is very slow ( 300 seg = 5 min )**_
 
 ```
-!# Displays the current date and time
+!!! Displays the current date and time
 # show clock
-!# Verifies if NTP clock is synchronized with the master NTP server
+!!! Verifies if NTP clock is synchronized with the master NTP server
 # show ntp status
 
-!# Set time manually
+!!! Set time manually
 # clock set HH:mm:ss [day] [month_3_letters] [year]
 
-(config)# clock timezone UTC -6 !# MX UTC
-(config)# ntp master  !# Configure device as NTP SERVER
-(config)# ntp server [ntp_server_ipv4]  !# Configure device as NTP CLIENT
+(config)# clock timezone UTC -6 !!! MX UTC
+(config)# ntp master  !!! Configure device as NTP SERVER
+(config)# ntp server [ntp_server_ipv4]  !!! Configure device as NTP CLIENT
 ```
 
 **Syslog**
@@ -64,26 +64,26 @@ _**IMPORTANT:** Configure correctly in all devices so, **certificates**, **proto
 _Syslog is an open standard of logging messages that complies Cisco´s IOS. All log messages are prompted in the **command line (RAM logging buffer) by default**, but they can be centralized and send to **external syslog servers**._
 
 ```
-!# Displays a syslog summary and buffered stored logs (RAM)
+!!! Displays a syslog summary and buffered stored logs (RAM)
 # show logging
 ```
 
 ```
-!# Disable syslog in line console
+!!! Disable syslog in line console
 (config)# no logging console
 
-!# Displays events with X severity or higher in VTY lines
-(config)# terminal monitor !# Enable seeing the console logs in VTY lines
+!!! Displays events with X severity or higher in VTY lines
+(config)# terminal monitor !!! Enable seeing the console logs in VTY lines
 (config)# logging monitor [severity_number]
 
-!# Store in RAM logging buffer events with severity X or higher
+!!! Store in RAM logging buffer events with severity X or higher
 (config)# logging buffered [severity_name]
 
-!# External Logging Server
+!!! External Logging Server
 (config)# logging [logging_server_ipv4]
 (config)% logging trap [severity_name]
 
-!# Turn-off debugging output
+!!! Turn-off debugging output
 (config)# undebug all
 ```
 
@@ -103,7 +103,7 @@ _**Cisco Discover Protocol (CDP)** allows to know **OS version** and **IP addres
 ```
 # show cdp neighbors [detail]?
 
-!# Enable/Disable CDP for security
+!!! Enable/Disable CDP for security
 (config)# [no]? cdp run
 ```
 
@@ -112,10 +112,10 @@ _The open standard Link Layer Discovery Protocol differs (LLDP) on CDP in only d
 ```
 # show lldp neighbors [detail]?
 
-!# Enable/Disable CDP for security
+!!! Enable/Disable CDP for security
 (config)# [no]? lldp run
 
-!# Allowing transmission on interface
+!!! Allowing transmission on interface
 (config)# interface {gigabit | ethernet} {0-X}/{0-X}
 (config-if)# [no]? lldp [transmit|receive]
 ```
@@ -169,10 +169,10 @@ _**Pre-requisite**: A hostname, RSA Key **(min 768)** and IP domain name must be
 (config)# ip domain-name [domain_name]
 (config)# crypto key generate rsa
 
-!# Remove RSA key
+!!! Remove RSA key
 (config)# crypto key zeroize rsa
 
-!# Verify RSA keys
+!!! Verify RSA keys
 # show crypto key mypubkey rsa
 ```
 
@@ -192,10 +192,10 @@ _**Pre-requisite**: A hostname, RSA Key **(min 768)** and IP domain name must be
 ```
 
 ´´´
-!# Block VTY connections for N seconds after X simultaneously failed attemps between Y seconds
+!!! Block VTY connections for N seconds after X simultaneously failed attemps between Y seconds
 (config)# login block-for [seconds_blocked] attempts [failed_attemps_number] within [interval_of_failing_seconds]
 
-!# Enable secure HTTPS SSH access
+!!! Enable secure HTTPS SSH access
 (config)# ip http secure-server
 (config)# ip http authentication local
 ´´´
@@ -218,19 +218,19 @@ _**RADIUS:** Open standard protocol. Commonly used for end **administrators acce
 _**TACACS+:** Open standard protocol. Commonly used for end **user level AAA services**, such as VPN access._
 
 ```
-!# Setup a backup route (only enable to use if RADIUS or TACACS+ servers can´t be reached)
+!!! Setup a backup route (only enable to use if RADIUS or TACACS+ servers can´t be reached)
 (config)# username [backup_username] secret [password]
 
-!# Configure AAA external usage
+!!! Configure AAA external usage
 (config)# aaa new-model
 
-!# Repeat commands to register multiple AAA servers
+!!! Repeat commands to register multiple AAA servers
 (config)# [radius | tacacs] server [server_name]
 (config-radius-server)# address ipv4 [ipv4_server]
 (config-radius-server)# key [server_name_locally_significant]
 
 (config-radius-server)# aaa group server [radius | tacacs+] [aaa_group_name]
-(config-sg-radius)# server name [server_name] !# Repeat command as many RADIUS servers registered
+(config-sg-radius)# server name [server_name] !!! Repeat command as many RADIUS servers registered
 
 (config-sg-radius)# aaa authentication login default group [aaa_group_name] local
 ```
@@ -242,10 +242,10 @@ _**TACACS+:** Open standard protocol. Commonly used for end **user level AAA ser
 _Note: By default all interfaces are set as **auto** negotiating the max speed in link.**Both sides in the link must be in the same** (auto-auto or manually changed in both) state so the link can work properly_
 
 ```
-!# Set manually the speed is recommended only on small networks
+!!! Set manually the speed is recommended only on small networks
 (config)# interface {gigabit | ethernet} {0-X}/{0-X}
 (config-if)# duplex [auto|full|half]
-(config-if)# speed [mbps] !# Can´t be set on virtual devices (needs to have the physical cable attatched)
+(config-if)# speed [mbps] !!! Can´t be set on virtual devices (needs to have the physical cable attatched)
 ```
 
 ## Addresing
@@ -262,20 +262,20 @@ _DHCP Operations (in-order of process)_
 4. **ACK**: The server is notified that the address has been accepted and **removes it from the pool** so it will not be offered again (at least for the lease time, then can be re-offered to other or the same client)
 
 ```
-!# Displays the number of leased/available addresses and pool data
+!!! Displays the number of leased/available addresses and pool data
 # show ip dhcp pool
 
-!# Displays relation between clients(MAC Addresses) and their leased IPs
+!!! Displays relation between clients(MAC Addresses) and their leased IPs
 # show ip dhcp binding
 
-!# Examinates the DHCP messages
+!!! Examinates the DHCP messages
 # show ip dhcp server statistics
 ```
 
 #### DHCP Server
 
 ```
-(config)# {ip | ipv6} dhcp excluded-addresses [start_ip_range_excluded] [end_ip_range_excluded]   !# Not used for IPv6
+(config)# {ip | ipv6} dhcp excluded-addresses [start_ip_range_excluded] [end_ip_range_excluded]   !!! Not used for IPv6
 (config)# {ip | ipv6} dhcp pool [dhcp_pool_name]
 (config-dhcp)# network [dhcp_network_to_assign_addresses] [netmask]
 (config-dhcp)# default-router [default_gateway_ip_to_propagate]
@@ -290,14 +290,14 @@ _By using SLAAC the **router advertise their interface IPv6 subnet (Global Unica
 _DHCPv6 represent a significant network security because it keeps track of IPv6-MAC addresses leased and because IPv6 is based on unicasting traffic an attacker can connect directly to a host. That´s why **the only reason to have DHCPv6 enable is for DNS acknowlegment** and we must **disable any possible IPv6 assignation from DHCP** converting all DHCP requests into **Stateless** to only conserve SLAAC IPv6_
 
 ```
-!# Configure on the interface that connects (or is the nearest to) to LAN memebers (the DHCP clients)
+!!! Configure on the interface that connects (or is the nearest to) to LAN memebers (the DHCP clients)
 (config)# interface {gigabit | ethernet} {0-X}/{0-X}
 (config-if)# ipv6 dhcp server [dhcp_ipv6_pool_name]
 
-!# STATEFUL: Defines the prefix to assign all new IPv6 addresses
+!!! STATEFUL: Defines the prefix to assign all new IPv6 addresses
 address prefix [ipv6_prefix]/[cidr]
 
-!# STATELESS: Doesn´t assigns IPv6 addresses, only dns-server, default-gateway & domain-name
+!!! STATELESS: Doesn´t assigns IPv6 addresses, only dns-server, default-gateway & domain-name
 (config-if)# ipv6 nd other-config-flag
 ```
 
@@ -306,15 +306,15 @@ address prefix [ipv6_prefix]/[cidr]
 _The **DHCP Discovery message (broadcast) is NOT forwarded for a router** if we have the DHCP server in other network. To enable DHCP communications and addressing response from one network to another we need to do the following configuration on any router in the middle of the client and server. If a **client is not reaching the DHCP server** it´ll have an **169.254.0.0** address._
 
 ```
-!# Router (non-DHCP server) interface connected to LAN (the default gateway for clients)
+!!! Router (non-DHCP server) interface connected to LAN (the default gateway for clients)
 (config)# interface {gigabit | ethernet} {0-X}/{0-X}
 
-!# DHCPv4
+!!! DHCPv4
 (config-if)# ip helper-address [next_hop_IPv4_to_reach_dhcp_server]
 
-!# DHCPv6
+!!! DHCPv6
 (config-if)# ipv6 dhcp relay destination [next_hop_IPv6_to_reach_dhcp_server] [exit_interface_to_DHCPv6_server]
-!# USE ONLY when STATEFUL DHCP wants to be enable
+!!! USE ONLY when STATEFUL DHCP wants to be enable
 (config-if)# ipv6 nd managed-config-flag
 
 Note: For next-hop IP, use the opposite address in the point-to-point link between the relay router (configuring) and the one that is the DHCP server (the one that has the next-hop IP locally connected)
@@ -323,7 +323,7 @@ Note: For next-hop IP, use the opposite address in the point-to-point link betwe
 #### DHCP Client
 
 ```
-!# Configuration interface to dynamic addressing
+!!! Configuration interface to dynamic addressing
 (config)# interface {gigabit | ethernet} {0-X}/{0-X}
 (config-if)# ip address dhcp
 ```
@@ -354,7 +354,7 @@ _Designed to support built-in security, host mobility and **solve problems in un
 ```
 # show ipv6 int brief
 
-!# Display link-local and global unicast address from neighbors
+!!! Display link-local and global unicast address from neighbors
 # show ipv6 neighbors
 ```
 
@@ -374,7 +374,7 @@ _Designed to support built-in security, host mobility and **solve problems in un
   _**Autogenerated IPv6 address** defining the network portion (64 bits) to use and by **MAC partitioning will be derived the host unique** assignation. The 48 bits in host **MAC is prefixed with FF:FE** and the **7th bit is modified** in order to get the 64 bits in host portion remaining. All **Link-local addresses are autogenerated with EUI-64 by default in Cisco devices**._
 
 ```
-!# Enable IPv6 usage
+!!! Enable IPv6 usage
 (config)# ipv6 unicast-routing
 ```
 
@@ -383,12 +383,12 @@ _Designed to support built-in security, host mobility and **solve problems in un
 (config-if)# description [interface_description]
 (config-if)# no shutdown
 
-!# Global Unique addressing
+!!! Global Unique addressing
 (config-if)# ipv6 address [ipv6_global_unique]/[cidr]?
-!# EUI-64 autogenerated addressing
+!!! EUI-64 autogenerated addressing
 (config-if)# ipv6 address [ipv6_64_network_prefix]/64? eui-64
 
-!# Override the EUI-64 default link-local
+!!! Override the EUI-64 default link-local
 (config-if)# ipv6 address [link_local_address] link-local
 ```
 
@@ -404,13 +404,13 @@ _Resolve FQDN via TCP or UDP using port 53_
 # **Routing Protocols**
 
 ```
-!# Displays the routing table
+!!! Displays the routing table
 # show ip route
 
-!# Displays the routing protocol running
+!!! Displays the routing protocol running
 # show ip protocols
 
-!# Display protocol configuration only
+!!! Display protocol configuration only
 # show running-config | section [protocol]
 ```
 
@@ -453,20 +453,20 @@ _Distance vector protocols send their entire routing table to directly connected
 _Enhanced Interior Gateway Routing Protocol (EIGRP), **only supported on Cisco devices**. It´s best path decition making is based on the combination between **bandwidth + delay** by an algorith called **DUAL** (Diffusive Update Algorithm) that calculates a certain K values. Fast convergence time, efficient multicast messages, for large networks & the only configurable protocol for unequal cost load balancing._
 
 ```
-!# Show adjacency via EIGRP
+!!! Show adjacency via EIGRP
 # show eigrp neighbors
 
-!# All eigrp enabled interfaces and it´s statistics
+!!! All eigrp enabled interfaces and it´s statistics
 # show ip eigrp interfaces
 ```
 
 ```
-!# Router EIGRP process level
+!!! Router EIGRP process level
 (config)# router eigrp [autonomous_system]
-(config-router)# eigrp router-id [router_id]          !# Manual Router-ID assignation
+(config-router)# eigrp router-id [router_id]          !!! Manual Router-ID assignation
 (config-router)# network [network_to_advertise] [wildcard]
-(config-router)# default-information originate        !# Default routes injection
-(config-router)# redistribute {static | ospf | rip}   !# Specific routes injection from other protocols
+(config-router)# default-information originate        !!! Default routes injection
+(config-router)# redistribute {static | ospf | rip}   !!! Specific routes injection from other protocols
 
 # Interface level EIGRP
 (config)# interface {gigabit | ethernet} {0-X}/{0-X}
@@ -481,7 +481,7 @@ _**Adjacency Requirements:** All **k values** and **autonomous system** must mat
 _Routing Information Protocol (RIP), it´s best path decition making is based on the **hop count (max 15)** to reach the targeted network. Upadtes of networks are send every **30 sec** by the **224.0.0.9 multicast** address. RIPv2 support authentication and VLSM. RIPng supports !=v6 network advertisement. Protocol only used on lab/test & small networks_
 
 ```
-!# All routes learned by RIP and the interfaces where reach them
+!!! All routes learned by RIP and the interfaces where reach them
 # show ip rip database
 ```
 
@@ -489,13 +489,13 @@ _Routing Information Protocol (RIP), it´s best path decition making is based on
 (config)# router rip
 (config-router)# version 2
 (config-router)# no auto-summary
-(config-router)# network [network_to_advertise]  !# Classful network
+(config-router)# network [network_to_advertise]  !!! Classful network
 
-!# Manual summarisation through neighborg interfaces
+!!! Manual summarisation through neighborg interfaces
 (config)# interface {gigabit | ethernet} {0-X}/{0-X}
 (config-if)# ip summary-address rip [network_to_advertise] [subnet_mask]
 
-!# Default route injection
+!!! Default route injection
 (config)# router rip
 (config-router)# default-information originate
 ```
@@ -526,39 +526,39 @@ _OSPF Router Types_
 - **Autonomous System Boundary Routers (ASBR)**: Redistributes routes learned from another source (static, EIGRP, RIP or other protocols) via OSPF (O\*E2)
 
 ```
-!# LSDB Link State Data Base
+!!! LSDB Link State Data Base
 # show ip ospf database
 
-!# All information about routers links connections
+!!! All information about routers links connections
 # show ip ospf neighbors
 
-!# Detail information of OSPF adjacencies with OSPF
+!!! Detail information of OSPF adjacencies with OSPF
 # show ip ospf interface brief
 ```
 
 ```
-!# Router OSPF process level
+!!! Router OSPF process level
 (config)# router ospf [process_id]
-(config-router)# log-adjacency-changes !# Advertise a log when OSPF link status change
+(config-router)# log-adjacency-changes !!! Advertise a log when OSPF link status change
 (config-router)# auto-cost reference-bandwidth [base_kbps]
 (config-router)# network [network_to_advertise] [wildcard] area [area_number]
-(config-router)# default-information originate !# Propagate default-static routes to area memebers
+(config-router)# default-information originate !!! Propagate default-static routes to area memebers
 
-!# MULTI-AREA: Network summarization for ABRs (IA) use to reduce entries in routing table
+!!! MULTI-AREA: Network summarization for ABRs (IA) use to reduce entries in routing table
 NOTE: The summarized subnet_mask must be EXACTLY the inverse of the wildcard declared when announcing the network in order for all the routes to be correctly advertised.
 (config-router)# area [area_id] range [network_to_advertise] [subnet_mask]
 
-!# Interface level OSPF
+!!! Interface level OSPF
 (config)# interface {gigabit | ethernet} {0-X}/{0-X}
 (config-if)# ip ospf [process_id] area [area_number]
 (config-if)# ip ospf cost [new_cost]
 (config-if)# ip ospf priority [new_priority]
-(config-if)# ip ospf network point-to-point !# Advertise interface using the subnet mask
+(config-if)# ip ospf network point-to-point !!! Advertise interface using the subnet mask
 (config-if)# ip ospf {hello-interval | dead-interval} [value]
 ```
 
 ```
-!# Reset OSPF to see Router-ID/priority changes (if doesn´t work, save & reload device)
+!!! Reset OSPF to see Router-ID/priority changes (if doesn´t work, save & reload device)
 # clear ip ospf process
 ```
 
@@ -573,11 +573,11 @@ _Intermediate System - Intermediate System Protocol (IS-IS), it depends on the c
 _Prevents or activates the transmission of hello packets for network discovery, commonly used for dynamic routing protocols to advertise networks to it´s attatched interfaces. A **passive interface can´t form adjacency** and must be redirect manually (static route). A **loopback must be set always as passive interface** because as a logical interface it´ll waste resources advertising a non-existent physical interface_
 
 ```
-!# Disable particular interfaces
+!!! Disable particular interfaces
 (config)# router {eigrp | ospf | rip} [autonomous_system]?
 (config-router)# passive-interface {gigabit | ethernet | loopback} {0-X}/{0-X}?
 
-!# Disable all by default & enable individually
+!!! Disable all by default & enable individually
 (config)# router {eigrp | ospf | rip} [autonomous_system]?
 (config-router)# passive-interface default
 (config-router)# no passive-interface {gigabit | ethernet | loopback} {0-X}/{0-X}?
@@ -593,30 +593,36 @@ _Border Gateway Protocol (BGP)_
 
 _Virtual Local Area Networks (VLAN) segments the broadcast domains in a switch by grouping ports. The VLAN is identified as another IP segment and the communication between multiple VLANs must be routed._
 
+The VLAN numbers _1002 through 1005 are reserved for Token Ring and FDDI VLANs_. VIDs 1 and 1002 to 1005 are automatically created, and you cannot remove them.
+
+The configurations for VIDs 1 to 1005 are written to the _vlan.dat_ file (VLAN database) that is stored in _flash memory_.
+
 ```
 # show vlan brief
-# show interface {gigabit | ethernet} {0-X}/{0-X} switchport
+# show interfaces {gigabit | ethernet} {0-X}/{0-X} switchport
+# show interfaces ({gigabit | ethernet} {0-X}/{0-X})? trunk
+# show mac address-table interface {gigabit | ethernet} {0-X}/{0-X}
 ```
 
 ## **Switch Inter-VLAN Configuration**
 
 ```
-!# VLAN Creation
+!!! VLAN Creation
 (config)# vlan [vlan_id]
 (config-vlan)# name [vlan_name]
 
-!# Access Port & VLAN port assigntation
+!!! Access Port & VLAN port assigntation
 (config)# interface range {gigabit | ethernet} {0-X}/{0-X} - {0-X}
 (config-if)# description [access_description]
 (config-if)# switchport mode access
 (config-if)# switchport access vlan [vlan_id]
-(config-if)# switchport voice vlan [voice_vlan_id]  !# Only used when need to segregate data from VoIP
+(config-if)# switchport voice vlan [voice_vlan_id]  !!! Only used when need to segregate data from VoIP
 
-!# Trunk Port (802.1Q)
+!!! Trunk Port (802.1Q)
 (config)# interface {gigabit | ethernet} {0-X}/{0-X}
 (config-if)# description [trunk_description]
 (config-if)# switchport trunk encapsulation dot1q
-(config-if)# switchport mode nonegotiate !# Disables DTP
+(config-if)# switchport mode nonegotiate !!! Disables DTP
 (config-if)# switchport mode trunk
 (config-if)# switchport trunk native vlan [native_vlan_id]
 (config-if)# switchport trunk allowed vlan [vlan_id1, vlan_id2, ...]
@@ -624,11 +630,12 @@ _Virtual Local Area Networks (VLAN) segments the broadcast domains in a switch b
 
 _**Administrative VLAN**: **Remote access management** VLAN for SSH/Telnet_
 _**Native VLAN**: Manage **untagged traffic** and **coordinates the trunk VLAN sharing** between 2 ports by communicating allowed VLANs by the same native ID (must match in every switch with trunk connection)_
+_**Type or Tag Protocol Identifier:** The IEEE 802.1Q inserts an extra 4-byte VLAN header into the Ethernet header of the original frame. Is set to a value of *0x8100* to identify the frame as an IEEE 802.1Q-tagged frame (*not present in native VLAN* traffic) + the VLAN ID identifies the VLAN to which the frame belongs. Can describe also traffic priority, and a MAC address format description (flag=1 for non-canonical & flag=0 for canonical)_
 
 _**Dynamic Trunking Protocol (DTP)**: Is a **Cisco propietary protocol**, negotiates the trunking connection between switches. It´s recommended to turn it off DTP **(nonegotiate)** and set the switchport mode to access or trunk manually to prevent VLAN-Hopping Attacks. In DTP all ports are set to **auto mode by default** and can only make an adjacency when the status is **auto-desirable** or **desirable-desirable** in both links._
 
 ```
-(config-if)# switchport mode dynamic [auto | desirable] !# DTP modes, not recommended to set in modern switches
+(config-if)# switchport mode dynamic [auto | desirable] !!! DTP modes, not recommended to set in modern switches
 ```
 
 _**VLAN Trunking Protocol (VTP):** Is a protocol that allows to add, edit or delete VLAN information in a centralized **VTP server (full crud, selected with the higher revision number)** to synchronise VLAN data (vlan.dat) with other switches **VTP clients**. The **VTP transparent** client does not participate in the VTP domain, but **will pass on all VLAN advertisements from servers to other clients without making updates to it´s vlan.dat**._
@@ -649,11 +656,11 @@ _Router-on-a-stick (ROAS subinterfaces)_
 **Note:** First off all you have to create a native subinterface (with the same native vlan_id on switch´s trunk link) in order to enable communication between vlans.
 
 ```
-!# Enable interface attatched to trunk switchport
+!!! Enable interface attatched to trunk switchport
 (config)# interface {gigabit | ethernet} {0-X}/{0-X}
 (config-if)#no shutdown
 
-!# Define virtual subinterfaces for each corssing VLAN
+!!! Define virtual subinterfaces for each corssing VLAN
 (config)# interface {gigabit | ethernet} {0-X}/{0-X}.[subinterface_number]
 (config-subif)# encapsulation dot1q [vlan_ID] [native]?
 (config-subif)# ip address [vlan_default_gateway] [netmask]
@@ -662,14 +669,14 @@ _Router-on-a-stick (ROAS subinterfaces)_
 _Multilayer Switch (SVIs)_
 
 ```
-!# Enable switch routing
+!!! Enable switch routing
 (config)# ip routing
 
-!# Define SVIs to manage each VLAN
+!!! Define SVIs to manage each VLAN
 (config)# interface vlan [vlan_id]
 (config-if)# ip address [vlan_default_gateway] [netmask]
 
-!# Configure router-switch connection (for WAN reachablity to other networks)
+!!! Configure router-switch connection (for WAN reachablity to other networks)
 (config)# interface {gigabit | ethernet} {0-X}/{0-X}.[subinterface_number]
 (config-subif)# no switchport
 (config-subif)# ip address [default_gateway] [netmask]
@@ -678,61 +685,137 @@ _Multilayer Switch (SVIs)_
 _Another way to route VLAN traffic can be having multiple interfaces of the router attatche to each different VLAN and enable the communication by a simple routing of interfaces. This will demand more physical media and it´s better to enable it by the other 2 techniques above. The usage of virtual subinterfaces (router-on-a-stick) represents more contention of bandwidth but requires less cables attatched._
 
 ```
-!# Reset a switchport to default configuration
+!!! Reset a switchport to default configuration
 (config)# default interface {gigabit | ethernet} {0-X}/{0-X}
 ```
 
-# **FHRP & Network Redundancy**
+# **FHRP Network Redundancy**
 
 _First Hop Redundancy Protocols: Controls **Layer 3 redundancy and failover recovery**. The usage of **Floating Static Routes** via other router is a feasible solution but we will need to do the manual configuration on each route we need to backup. The problem starts when we look at the **access layer (where hosts)** are assigned with certain default gateway, and **if that gateway fails they need to have another entry to send outside traffic.**_
 
 ## HSRP
 
-_The **Hot Standby Redundancy Protocol (HSRP)** is a Cisco´s protocol, creates a **Virtual Gateway IP (VIP)** to assign hosts, if any redundancy routers at distribution layer fails the remaining operational router takes over the operation with transparent service for the hosts. Selects an **active** router which will route all the network traffic through them and if it fails the remaining router in **standby** mode will take the ownership to be the active router._
+The **Hot Standby Redundancy Protocol (HSRP)** s an FHRP that Cisco designed to create a redundancy framework between network routers or switches to achieve default gateway failover capabilities. Only one router forwards traffic. HSRP is defined in Request for Comments (RFC) 2281.
 
-_We can defined the router that can be active by modifying its **priority (default 100)**, if a tie priority happends the **highest IP** wins the active mode. But is **important to set a preemtion for this**, otherwise the interface will be flapping with the ownership._
+It creates a **Virtual Gateway IP (VIP)** to assign hosts, if any redundancy routers at distribution layer fails the remaining operational router takes over the operation with transparent service for the hosts. Selects an **active** router which will route all the network traffic through them and if it fails the remaining router in **standby** mode will take the ownership to be the active router.
+
+We can defined the router that can be active by modifying its **priority (default 100)**, if a tie priority happends the **highest IP** wins the active mode. But is **important to set a preemtion for this**, otherwise the interface will be flapping with the ownership. All the hello messages sent through HSRP to define active/standby are sent via **HSRPv1: 224.0.0.2 UDP port 1985** and **HSRPv2: 224.0.0.102**
+
+_HSRP Interface Tracking_
+HSRP can track interfaces and it can **decrement priority if any interface or the router fails**, not only the one in which the VIP is assigned. It helps the re-convergence time, by not depending on only the failing of the interface assigned as default gateway (for end-devices) to recover the HSRP process.
+
+_HSRP Load Sharing with HSRP Multigroup_
+HSRP do not support load sharing, it can only foward traffic through 1 active router. However **load-sharing can be archived by MHSRP having an active router per VLAN**. In order to define MHSRP you must:
+
+- Create each VLAN
+- Define STP roles per router (primary or secondary)
+- Configure an SVI with physical and standby VIP address
+- Define the `priority` and activate the `preempt` faculties
 
 ```
-!# Displays VIP information & active/standby assignation
+!!! Displays VIP information & active/standby assignation
 # show standby {brief | neighbors}?
+
+!!! Display VIP and Virtual MAC address (0000.0C07.ACXX)
+# show ip arp
+
+!!! Verify the HSRP state transition.
+# debug standby events
 ```
 
 ```
-(config)# interface {gigabit | ethernet} {0-X}/{0-X}
-(config-if)# ip address [ip_address] [netmask]    !# Physical address DIFFERENT in both routers
-(config-if)# standby [hsrp_id] ip [vip_address]   !# Virtual address EQUAL in both routers
-(config-if)# standby [fhrp_id] priority [priority]
-(config-if)# standby [fhrp_id] preempt            !# USE ONLY in the router you want to convert active with HIGHEST PRIORITY
-(config-if)# standby [hsrp_id] authentication md5 key-string [password] !# Authenticates MD5 without key-chain
+(config)# interface {interface | SVI} [vlan_id]?
+(config-if)# standby [hsrp_group] version {1 | 2} !!! Versions must match. V2 for IPv6
+
+(config-if)# ip address [ip_address] [netmask]      !!! Physical address DIFFERENT in both routers
+(config-if)# standby [hsrp_group] ip [vip_address]  !!! Virtual address EQUAL in both routers
+                                                    !!! VIP must exists inside physiscal subnet space
+
+(config-if)# standby [hsrp_group] track {interface | SVI} [vlan_id]? [decrement_value] !!! Decrements 10 by default
+(config-if)# standby [hsrp_group] priority [priority]
+(config-if)# standby [hsrp_group] preempt [delay minimum]? [msec]?  !!! 50% time above after reboot
+
+(config-if)# standby [hsrp_group] authentication [password]
+(config-if)# standby [hsrp_group] authentication md5 key-string [7]? [password] !!! Enter 7 if password is already hashed
+(config-if)# standby [hsrp_group] authentication md5 key-chain [chain_name]
+
+(config-if)# standby [hsrp_group] timers [msec]? [hello_time] [msec]? [hold_time]
+(config-if)# no standby group timers  !!! Default in seconds (hello: 3sec, hold: 10sec)
+
 (config-if)# no shutdown
+
+----------------------
+!!! Key-chain Creation
+(config)# key chain chain-name
+(config-keychain)# key key-number
+(config-keychain-key)# key-string [0 | 7] string
+(config-keychain-key)# exit
 ```
 
-_Another FHRP protocols used are **Virtual Redundancy Router Protocol (VRRP) open standard** and **Cisco´s Gateway Load Balancing Protocol (GLBP)**_
+## VRRP
+
+The **Virtual Redundancy Router Protocol (VRRP)** is an open FHRP standard that offers the ability to add more than two routers for additional redundancy. Only one router forwards traffic. VRRP is defined in RFC 5798.
+
+VRRP differs from HSRP in that it **allows you to use an address of one of the physical VRRP group members as a virtual IP address**. In this case, the device with the used physical address is a **VRRP Master (Active)** whenever it is available. Uses the **224.0.0.18** multicast address, with the protocol number 112. In VRRP _preemption is enabled by default_. Only Cisco devices still support VRRP timers in milliseconds (otherwise always works in seconds) and authentication methods for plaintext and MD5.
+
+```
+!!! Display VRRP configuration, VIP and Virtual MAC address (0000.5E00.ACXX)
+# show vrrp
+```
+
+```
+(config)# interface {interface | SVI} [vlan_id]?
+(config-if)# ip address [ip_address] [netmask]  !!! Physical address DIFFERENT in both routers
+(config-if)# vrrp [vrrp_group] ip [vip_address] !!! Virtual address EQUAL in both routers (could be same as one of the physical)
+(config-if)# vrrp [vrrp_group] priority [priority]
+(config-if)# vrrp [vrrp_group] authentication {text | md5} [key-string]? [password] !!! Use key-string while MD5
+
+```
+
+## GLBP
+
+_The **Gateway Load Balancing Protocol (GLBP)** is an FHRP that Cisco designed to allow multiple active forwarders to load-balance outgoing traffic._
 
 # **STP & Loop Prevention**
 
-_Spanning Tree Protocol (STP) **prevents loops in layer 2**, which cause 3 main problems: **broadcast storms**, **un-stable MAC tables (CAM)** and **multiple frame transmission**._
+## Spanning Tree Protocol (STP)
+
+**Prevents loops in layer 2**, which cause 3 main problems:
+
+- _Broadcast storms:_ Each switch on a redundant network floods broadcasts frames endlessly. Switches flood broadcast frames to all ports except the port on which the frame was received. These frames then travel around the loop in all directions.
+- _Multiple frame transmission:_ Multiple copies of the same unicast frames may be delivered to a destination station, which can cause problems with the receiving protocol. Many protocols expect to receive only a single copy of each transmission. Multiple copies of the same frame can cause unrecoverable errors.
+- _MAC database instability:_ This problem results from copies of the same frame being received on different ports of the switch. The MAC address table maps the source MAC address on a received packet to the interface it was received on. If a loop occurs, then the same source MAC address could be seen on multiple interfaces, causing instability. Data forwarding can be impaired when the switch consumes the resources that are coping with instability in the MAC address table.
 
 _STP Terminology_
 
-- **BPDU**: Bridge Processing Data Unit, contains BridgeID information and set all enable ports in a switch to **blocking state (default)** until find out if can forward if no loop was detected **(50 sec to converge)**
-- **BridgeID**: Contains **MAC** and **Priority (0-65535) default 32768**
-- **Root Bridge**: Elected by lowest BridgeID, **lowest priority or lowest MAC** all of its ports are in forwarding state (**designated state**).
+- **BridgeID**: **Priority (0-65535) default 32768 + VLAN 1 = 32769** with increments of 4096 + device **MAC Address**
+- **Root Bridge (RB)**: Elected by lowest BridgeID, **lowest priority or lowest MAC** all of its ports are in forwarding state (**designated state**).
+- **BPDU**: Bridge Processing Data Unit, BPDUs are frames that have information about Spanning Tree Protocol. They are used for root bridge election and for loop identification. By default, BPDUs are sent out every **2 seconds(hello-timer)** remains **15 sec listening/learning states(forward delay)** and converges up to **20 secs (aging time)**. All BPDUs are share through multicast address **01-80-c2-00-00-00**. Exists 3 BPDU types:
+  - BPDU TCN (Topology Change Notification): Sended when a link goes down to inform the RB & other routers reporting the issue.
+  - BPDU TCA (Topology Change Acknowledgement): Response from the TCN, acknoledge by a RB or any switch with designated state link that can communicate the message to the RB.
+  - Configuration BPDU (TC): BPDU sended by RB only informing the new connection state for other switches.
 - **Root Port**: Interfaces from other switches (not Root Bridge) directly conected to the selected Root Bridge.
-- **Blocked Port (blocked/alternated state)**: It´s the port attatched to the **highest BridgeID neighbor** or **highest Port/Interface Number to reach Root Bridge**, doesn´t forward traffic and it´s administrative down to prevent loop.
+
+_STP Port States: Disabled (shutdown), Blocking (receives BPDUs only), Listening (receive/send BPDUs), Learning(receive/send BPDUs & learn MAC addresses), Forwarding (all functional, sending packets)_
 
 _STP Versions_
 
-- **802.1D STP**: Use STP for all the VLANs in the LAN, the open standard.
-- **802.1W RSTP**: Rapid Spanning Tree Protocol, improve the convergence time but keeps using one STP for all VLANs in the LAN.
-- **802.1S MSTP**: Load balance the STP for different VLANs **(up to 16 VLAN instances):**
-  - **PVST+**: **Per-VLAN Spanning-tree**, is a Cisco enhancement of 802.1D **(default on Cisco switches)**, and **for each VLAN the traffic assign a blocked port, optimizing the media usage**. The blocking ports are called "alternate" in this protocol.
-  - **RPVSP+**: **Rapid Per-VLAN Spanning-tree**, is a Cisco enhancement of 802.1W, **improved PVST+ convergence time** and also separetes VLAN traffic.
+- **802.1D STP**: Open standard. One STP instance for an entire network (no mattering the VLANs).
+- **PVST+ (Default)**: Cisco enhancement of 802.1D STP for each VLAN that is configured in the network.
+- **802.1W RSTP**: IEEE 802.1w. Improve the convergence time, port roles & link costs of STP (one instance for all the VLANS as STP).
+- **802.1S MSTP**:
+  - Reduces CPU utilization & communication by grouping **(up to 16 VLAN instances)**
+  - IEEE standard that is inspired by the earlier Cisco proprietary MISTP implementation.
+    _Note: It is recommended that you **do not run MST on access ports** between switches. It is also recommended that you **do not manually prune VLANs from trunks.**_
+- **Rapid PVST+**: Cisco enhancement of 802.1W RSTP (with multiple instances per each VLAN as PVST).
 
-_STP Configuration_
+## STP & RSTP Configuration
 
 ```
-!# Displays the STP information (PVST+ default = ieee)
+!!! Displays all STP instances information
+# show spanning-tree summary
+
+!!! Displays the STP information (PVST+ default = ieee)
 ---------------------------------------------------
 Note: The command divides in 3 outputs:
  "Root ID" that must match in all VLAN switch members
@@ -741,30 +824,88 @@ Note: The command divides in 3 outputs:
 ---------------------------------------------------
 # show spanning-tree vlan [vlan-id]
 
-!# Display MAC from other connected switches & interfaces
+!!! Display MAC from other connected switches & interfaces
 # show mac address-table
+
+!!! Observe STP convergence messages
+# debug spanning-tree events
+# undebug all
 ```
 
 ```
-!# Change Spanning-tree mode
-(config)# spanning-tree mode {rapid-pvst | pvst | mst}
+!!! Configure spanning-tree mode
+(config)# spanning-tree mode {rapid-pvst | pvst}
 
-!# Manipulate Bridge Priority
-(config)# spanning-tree vlan [vlan_id] root {primary | secondary}     !# Decrements automatically priority to win Root Bridge or Backup authority
+!!! Manually assign priority (0-65535 on increments of 4096)
+(config)# spanning-tree vlan [vlan_id] priority [bridge_priority]
+
+!!! Automatically assign priority
+(config)# spanning-tree vlan [vlan_id] root {primary | secondary}
+
+!!! Configure link cost (1-65,535)
+(config)# interface [interface]
+(config-if)# spanning-tree vlan [vlan_id] cost [cost]
+
+!!! Configure port priority (0-255) default 128
+(config)# interface [interface]
+(config-if)# spanning-tree vlan [vlan_id] port-priority [port-priority]
+
+!!! Configure link as point-to-point
+(config)# interface [interface]
+(config-if)# spanning-tree link-type {point-to-point | shared}
+
+!!! Configure timers
+(config)# spanning-tree vlan [vlan_id] {hello-time | forward-time | max-age} [seconds]
 ```
 
-_For **switchport access interfaces**, the usage of STP is no needed so we can skip the 50 secs of convergence by **port-fasting frames**_
+- _Shared (default):_ Half-duplex mode. Connected to shared media where multiple switches might exist.
+- _Point-to-point:_ Full-duplex mode. Port is connected to a single switch/end device at the other end of the link.
+
+## MSTP Configuration
 
 ```
-(config)# interface {gigabit | ethernet} {0-X}/{0-X}
+!!! Configure multiple spanning-tree mode
+(config)# spanning-tree mode mst
+
+!!!
+# show spanning-tree mst configuration
+
+!!!
+# show spanning-tree mst configuration digest
+
+!!!
+# show spanning-tree mst [instance_id]
+
+!!!
+(config)# spanning-tree mst [instance_id] root {primary | secondary}
+(config)# spanning-tree mst [instance_id] priority [instance_priority]
+
+!!!
+(config)# spanning-tree mst configuration
+(config-mst)# name CCNP
+(config-mst)# revision 1
+
+!!!
+(config)# spanning-tree mst configuration
+(config-mst)# instance 1 vlan 2,3
+(config-mst)# instance 2 vlan 4,5
+(config-mst)# end
+```
+
+_BPDU GUARDS_
+
+For **switchport access interfaces**, the usage of STP is no needed so we can skip the 50 secs of convergence by **port-fasting frames**
+
+```
+(config)# interface [interface]
 (config-if) spanning-tree portfast
 (config-if) spanning-tree bpduguard enable
-(config-if) spanning-tree guard root !# USE ONLY when we don´t want to receive BridgeID challenges to change the actual Root Bridge through the interface
+(config-if) spanning-tree guard root !!! USE ONLY when we don´t want to receive BridgeID challenges to change the actual Root Bridge through the interface
 
-!# Enable globally BPDU Guard (highly recommended)
+!!! Enable globally BPDU Guard (highly recommended)
 # spanning-tree portfast bpduguard default
 
-!# Disables globally STP blocking states (not recommended unless we can garantee no loop in the switch)
+!!! Disables globally STP blocking states (not recommended unless we can garantee no loop in the switch)
 # spanning-tree portfast default
 
 ```
@@ -788,10 +929,10 @@ _**Port Agregation Protocol (PAgP)** is the Cisco´s standard where both sides n
 _The switches **do not negotiate portchannel**, but both sides have to be set in mode **on-on** to come up._
 
 ```
-!# Displays EtherChannel protocol, link status and interfaces aggregated
+!!! Displays EtherChannel protocol, link status and interfaces aggregated
 # show etherchannel summary
 
-!# Verify that STP is not blocking aggregated links
+!!! Verify that STP is not blocking aggregated links
 # show spanning-tree vlan [vlan_id]
 ```
 
@@ -809,10 +950,10 @@ _The switches **do not negotiate portchannel**, but both sides have to be set in
 _The ACLs secure L3 and L4 by **filtering and identifying (QoS) incoming** and **outgoing** traffic. They filter via comparing **Access Control Entries (ACE)** that can match **packets**, **ports** and **transport protocols (TCP/UDP)** in the routering devices._
 
 ```
-!# Displays detail information of a particular ACL
+!!! Displays detail information of a particular ACL
 # show access-list [acl_number | acl_name]
 
-!# Displays ACL implementation on inteface
+!!! Displays ACL implementation on inteface
 # show ip interface {gigabit | ethernet} {0-X}/{0-X} | include access list
 ```
 
@@ -821,10 +962,10 @@ _The ACLs secure L3 and L4 by **filtering and identifying (QoS) incoming** and *
    _**The ACE ordering in the ACL matters**, the router will interpret (top -> bottom) all the instructions set and included in the policies lists. **By default the ACE last statement (implicity set)** in every ACL is **deny any any** restricting all undeclared traffic._
 
    ```
-   !# Numbered ACL
+   !!! Numbered ACL
    (config)#access-list [acl_number] {permit | deny | remark} {protocol} [source_ip_address] [wildcard | host | any] {gt | eq}? [port_number | app_name]? [destination_ip_address] [wildcard | host | any] {qualifier}? [port_number | app_name]?
 
-   !# Named ACL
+   !!! Named ACL
    (config)#ip access-list {standard | extended} [acl_name]
    (config-std-nacl)# {permit | deny |remark}  {protocol} [ip_address] [wildcard | host | any] {qualifier}? [port_number | app_name]?
    ```
@@ -859,13 +1000,13 @@ _The ACLs secure L3 and L4 by **filtering and identifying (QoS) incoming** and *
 _It started when IPv4 became to run out of public addresses registered by the IANA. That was solved by using **private addresses from RFC 1918 in LAN segments** and transalting them via NAT when going out the internet by WAN cannections. **NAT maps statically or dynamically one private IP with a public IP address to allow outside communication**_
 
 ```
-!# Display the inside & outside (local and global) address mapping
+!!! Display the inside & outside (local and global) address mapping
 # show ip nat translation
 
-!# Removes all Dynamic NAT translation bindings in order to allow NAT configuration modifications
+!!! Removes all Dynamic NAT translation bindings in order to allow NAT configuration modifications
 # clear ip nat translation *
 
-!# Display inside/ouside interfaces and how many packets has been sended & translated
+!!! Display inside/ouside interfaces and how many packets has been sended & translated
 # show ip nat statistics
 ```
 
@@ -877,15 +1018,15 @@ _It started when IPv4 became to run out of public addresses registered by the IA
 _Maps **1-to-1 private and public addresses**. Usualy used for servers which must **accept incoming connections**._
 
 ```
-!# Configure interface connected to the WAN (public address)
+!!! Configure interface connected to the WAN (public address)
 (config)# interface {gigabit | ethernet} {0-X}/{0-X}
 (config-if)# ip nat outside
 
-!# Configure interface connected to the LAN (private address)
+!!! Configure interface connected to the LAN (private address)
 (config)# interface {gigabit | ethernet} {0-X}/{0-X}
 (config-if)# ip nat inside
 
-!# Map privat-public addresses
+!!! Map privat-public addresses
 (config)# ip nat inside source static [private_ip_address] [public_ip_address]
 ```
 
@@ -894,21 +1035,21 @@ _Maps **1-to-1 private and public addresses**. Usualy used for servers which mus
 _Uses a **pool of public addresses** (similar to DHCP). Is used for **hosts that needs to connect externally to the internet but not receiving incoming connections.** The addressing assignment is set as **FIFO**. The NAT pool must have enough addresses for all hosts in the inside LAN._
 
 ```
-!# Configure interface connected to the WAN (public address)
+!!! Configure interface connected to the WAN (public address)
 (config)# interface {gigabit | ethernet} {0-X}/{0-X}
 (config-if)# ip nat outside
 
-!# Configure interface connected to the LAN (private address)
+!!! Configure interface connected to the LAN (private address)
 (config)# interface {gigabit | ethernet} {0-X}/{0-X}
 (config-if)# ip nat inside
 
-!# Set a NAT pool
+!!! Set a NAT pool
 (config)# ip nat pool [nat_pool_name] [start_public_addresses] [end_public_addresses] netmask [netmask]
 
-!# Create an ACL for all INSIDE hosts that will be using the pool addreses
+!!! Create an ACL for all INSIDE hosts that will be using the pool addreses
 (config)# access-list [acl_number] permit [ip_matching_for_hosts] [wildcard]
 
-!# Associate the ACL with the NAT pool
+!!! Associate the ACL with the NAT pool
 (config)# ip nat inside source list [acl_number] pool [nat_pool_name]
 ```
 
@@ -919,21 +1060,21 @@ _Allows a **same public address to be re-used by many hosts**, the problem on Dy
 ### Well-known Public Address (NO DHCP)
 
 ```
-!# Configure interface connected to the WAN (public address)
+!!! Configure interface connected to the WAN (public address)
 (config)# interface {gigabit | ethernet} {0-X}/{0-X}
 (config-if)# ip nat outside
 
-!# Configure interface connected to the LAN (private address)
+!!! Configure interface connected to the LAN (private address)
 (config)# interface {gigabit | ethernet} {0-X}/{0-X}
 (config-if)# ip nat inside
 
-!# Set a NAT pool
+!!! Set a NAT pool
 (config)# ip nat pool [nat_pool_name] [start_public_addresses] [end_public_addresses] netmask [netmask]
 
-!# Create an ACL for all INSIDE hosts that will be using the public address
+!!! Create an ACL for all INSIDE hosts that will be using the public address
 (config)# access-list [acl_number] permit [ip_matching_for_hosts] [wildcard]
 
-!# Associate the ACL with the PAT OVERLOAD
+!!! Associate the ACL with the PAT OVERLOAD
 (config)# ip nat inside source list [acl_number] pool [nat_pool_name] overload
 ```
 
@@ -942,19 +1083,19 @@ _The `overload` flag on the last command `enable the port usage for PAT`. But is
 ### Dynamic Public Address (DHCP)
 
 ```
-!# Configure interface connected to the WAN (public address) given by a DHCP Server in ISP
+!!! Configure interface connected to the WAN (public address) given by a DHCP Server in ISP
 (config)# interface {gigabit | ethernet} {0-X}/{0-X}
 (config-if)# ip address dhcp
 (config-if)# ip nat outside
 
-!# Configure interface connected to the LAN (private address)
+!!! Configure interface connected to the LAN (private address)
 (config)# interface {gigabit | ethernet} {0-X}/{0-X}
 (config-if)# ip nat inside
 
-!# Create an ACL for all INSIDE hosts that will be using the public address
+!!! Create an ACL for all INSIDE hosts that will be using the public address
 (config)# access-list [acl_number] permit [ip_matching_for_hosts] [wildcard]
 
-!# Associate the ACL with the PAT OVERLOAD
+!!! Associate the ACL with the PAT OVERLOAD
 (config)# ip nat inside source list [acl_number] interface [outside_interface] overload
 ```
 
@@ -1008,8 +1149,8 @@ _The clients of a DHCP server need a relay agent (ip helper address) to foward t
 
 ```
 (config)# ip dhcp snooping
-(config)# ip dhcp snooping vlan [vlan_id] !# epeat for all DHCP client´s VLANs
-(config)# interface {gigabit | ethernet} {0-X}/{0-X} !# Use on interface connected to Gateway (with the set ip-helper address)
+(config)# ip dhcp snooping vlan [vlan_id] !!! epeat for all DHCP client´s VLANs
+(config)# interface {gigabit | ethernet} {0-X}/{0-X} !!! Use on interface connected to Gateway (with the set ip-helper address)
 (config-if)# ip dhcp snooping trust
 ```
 
@@ -1018,10 +1159,10 @@ _The clients of a DHCP server need a relay agent (ip helper address) to foward t
 _**Man-in-the-middle and DoS** attack. A device attatched to the LAN **anticipates any ARP request from hosts to their default gateway** by doing a **Gratuitous ARP (CAM poisoning)**, where the attacker sends a **broadcast message to the switch indicating it´s MAC address and faking the real default gateway IP**. With that done, the switch **register in CAM the MitM fake MAC address** and all hosts will be unicasting traffic through it. To prevent this a **DHCP Snooping needs to be enable so the switch can map trusted assigned IPs with its real MACs**_
 
 ```
-(config)# interface {gigabit | ethernet} {0-X}/{0-X} !# Use on interface connected to Gateway (with the set ip-helper address)
+(config)# interface {gigabit | ethernet} {0-X}/{0-X} !!! Use on interface connected to Gateway (with the set ip-helper address)
 (config-if)# ip arp inspection trust
 
-(config)# ip arp inspection vlan [vlan_ID] !# epeat for all DHCP client´s VLANs
+(config)# ip arp inspection vlan [vlan_ID] !!! epeat for all DHCP client´s VLANs
 ```
 
 ### Identity Based Networking (802.1X)
@@ -1033,23 +1174,23 @@ _Any **host (Supplicant)** that wants to connect in LAN or access WAN first send
 _Defined a **mapping between allowed MAC addresses that can be attatched to certain switchport** and the **mechanisms in case of switchport violation**_
 
 ```
-!# Display interface security settings
+!!! Display interface security settings
 # show port-security interface {gigabit | ethernet} {0-X}/{0-X}
 
-!# Display port-MAC association table
+!!! Display port-MAC association table
 # show port-security address
 
-!# Displays port summary its status and violations
+!!! Displays port summary its status and violations
 # show port-security
 ```
 
 ```
 (config)# interface {gigabit | ethernet} {0-X}/{0-X}
 (config-if)# switchport mode {access | trunk}
-(config-if)# switchport port-security !# y default allow 1 MAC at the time (no mattering the exact MAC attatched) and shutdowns if more than 1 hosts are connected
+(config-if)# switchport port-security !!! y default allow 1 MAC at the time (no mattering the exact MAC attatched) and shutdowns if more than 1 hosts are connected
 (config-if)# switchport port-security violation {shutdown | protect | restrict}
 (config-if)# switchport port-security maximum [max_MAC_allowed]
-(config-if)# switchport port-security mac-address {sticky | MAC_address} !# ssociate specific MAC to the port to be learned in next plug-in or manually set
+(config-if)# switchport port-security mac-address {sticky | MAC_address} !!! ssociate specific MAC to the port to be learned in next plug-in or manually set
 ```
 
 - **Shutdown (default)**: The interface is placed in **error-disabled state** blocking all traffic. To enable the port again, you need to manually de-attatch any unauthorized MAC, shutdown and bring up the interface. It can also be **re-activated automatically again by a timer** using following commands:
@@ -1085,15 +1226,15 @@ _**Syslog vs. SNMP**: Even that **both can store logging information**, is that 
 _Use SNMPv2 only when SNMPv3 is not supported. The Community Strings travels as plain text._
 
 ```
-!# Optional: Identificate SNMP AGENT to the SNMP MANAGER (recommended)
+!!! Optional: Identificate SNMP AGENT to the SNMP MANAGER (recommended)
 (config)# snmp-server contact [snmp_agent_identifier]
 (config)# snmp-server location [location_description]
 
-!# Configure community string & privileges for SNMP AGENTS
+!!! Configure community string & privileges for SNMP AGENTS
 (config)# snmp-server community [community_string] [privilege]
-!# Privilege types: "ro" = read-only , "rw" = read-write
+!!! Privilege types: "ro" = read-only , "rw" = read-write
 
-!# Reference the SNMP MANAGER (for each agent)
+!!! Reference the SNMP MANAGER (for each agent)
 (config)# snmp-server host [snmp_server_ipv4] [community_string_for_desired_privileges]
 (config)# snmp-server enable traps [action_that_tiggered_trap_to_server]
 ```
@@ -1159,23 +1300,23 @@ _It´s the manipulation of the queue so get better service to the traffic that r
 - **Low Latency Queue (LLQ):** Similar to CBWFQ but with a **priority queue**.
 
 ```
-!# Group the interest traffic (Class Map)
+!!! Group the interest traffic (Class Map)
 (config)# class-map [traffic_group_name]
-(config)# match ip dscp [dscp_alias] !# As "ef", "cs3", "af41", etc...
+(config)# match ip dscp [dscp_alias] !!! As "ef", "cs3", "af41", etc...
 
-!# Define the percentage of utilization in case of congestion (Policy Map)
+!!! Define the percentage of utilization in case of congestion (Policy Map)
 (config)# policy-map [policy_name]
 (config)# class [traffic_group_name]
 (config)# shape average [bandwidth_limit_rate_to_start_buffering]
 (config)# priority percent [bandwidth_guaranteed_utilization_in_case_of_congestion]
 (config)# {service-policy [nested_policies]}?
 
-!# Setup utilization & shaping for remaining traffic types
+!!! Setup utilization & shaping for remaining traffic types
 (config)# class class-default
 (config)# shape average [bandwidth_limit_rate_to_start_buffering]
 (config)# fair-queue
 
-!# Apply policy to the outbound interface in WAN for dispatching (Service Policy)
+!!! Apply policy to the outbound interface in WAN for dispatching (Service Policy)
 (config)# interface {gigabit | ethernet} {0-X}/{0-X}
 (config-if)# bandwidth [100%_of_capable_interface_bandwidth_kbps]
 (config-if)# service-policy out [policy_name]
@@ -1271,28 +1412,28 @@ _The protocol used for WLCs to manage APs collections is the **Control And Provi
 1. Configure Switch -> WLC connection
 
    ```
-   !# Configure a DHCP for Access-Point addressing and connection to WLC
+   !!! Configure a DHCP for Access-Point addressing and connection to WLC
    (config)# ip dhcp excluded-addresses [start_excluded] [end_excluded]
    (config)# ip dhcp pool [pool_name]
    (dhcp-config)# network [access_points_network] [netmask]
    (dhcp-config)# default-router [management_svi_ipv4]
    (dhcp-config)# option 43 ip [wlc_ipv4]
 
-   !# Associate a VLAN + SVI for each SSID & the management of wireless devices
+   !!! Associate a VLAN + SVI for each SSID & the management of wireless devices
    (config)# vlan [vlan_ID]
    (config-vlan)# name [ssid_name]
    (config-vlan)# exit
    (config)# interface vlan [vlan_ID]
    (config-if)# ip address [default_gateway_for_ssid_members] [netmask]
 
-   !# Configure LAN Switch -> WLC link connection as TRUNK mode
+   !!! Configure LAN Switch -> WLC link connection as TRUNK mode
    (config)# interface {ethernet | gigabit} {0-X}/{0-X}
    (config-if)# description [describe_link_2_WLC]
    (config-if)# switchport trunk encapsulation dot1q
    (config-if)# switchport mode trunk
    (config-if)# switchport trunk allowed vlan [management_and_ssid_vlans]
 
-   !# Configure LAN Switch -> each Access-Point
+   !!! Configure LAN Switch -> each Access-Point
    (config)# interface {ethernet | gigabit} {0-X}/{0-X}
    (config-if)# description [describe_link_2_AP]
    (config-if)# switchport mode access
@@ -1468,7 +1609,7 @@ _In traditional networking infrastructures the devices manage their own data and
     ```
     $ ifconfig
 
-    !# In modern Linux the command is:
+    !!! In modern Linux the command is:
     $ ip address show
     ```
 
@@ -1477,7 +1618,7 @@ _In traditional networking infrastructures the devices manage their own data and
     ```
     $ netstat -rn
 
-    !# In modern Linux the command is:
+    !!! In modern Linux the command is:
     $ ip route show
     ```
 

@@ -57,6 +57,7 @@ EIGRP uses *Reliable Transport Protocol (RTP)* which *runs above the IP layer as
   (config-if)# ipv6 authentication key-chain eigrp [as-number] [keychain-name]
   (config-if)# ip authentication mode eigrp [as-number] md5 !!! hmac-sha-256 not supported on this mode
   ```
+
 - *Named Mode*
 
   Centralizes the EIGRP configuration for IPv4 and IPv4. Uses *64-bit* wide metrics. EIGRP named mode configuration is available in Cisco IOS Software Release 15.0(1)M, 12.2(33)SRE, 12.2(33)XNE and later releases.
@@ -263,13 +264,105 @@ _Note: If the problem persists, verify if there is an *ACL blocking* advertiseme
 
 
 
-## Notes
+## OSPF
+
+As EIGRP, OSPF works on top of IP and uses protocol number *89*. It does not rely on the functions of TCP or UDP. It has 2 versions. 
+- *OSPFv2:* Uses multicast and unicast, rather than broadcast. *224.0.0.5* to send information to all OSPF routers and *224.0.0.6* to send information to DR or Backup Designated Router (BDR) routers. 
+- *OSPFv3:* *Supports IPv6* and uses *FF02::5* to send information to all OSPF routers and *FF02::6* to send information to DR or Backup Designated Router (BDR) routers. 
+
+### Implementing
+
+#### Classic vs Named Mode
+
+- *OSPFv2*
+  ```
+  (config)# ipv6 unicast routing
+  (config)# access-list [ACL_number] {permit | deny} [ipv4] [subnet]
+  (config)# ip prefix-list seq {seq_number | PFL_name} PFL {permit | deny} [ipv4_cidr]
+
+  (config)# [ipv6] router ospf [as_number]
+  (config-router)# router-id [id]
+  (config-router)# [no]? passive-interface {default | [interface]}
+  (config-router)# auto-cost reference-bandwidth [10000] !!! 10Gbps
+  (config-router)# area [area_number] filter-list prefix [PFL_name] {in | out}
+  (config-router)# area [area_number] range [ABR_summary_prefix] [not-advertise]?
+  (config-router)# summary-prefix [ASBR_summary_prefix]
+  (config-router)#[no]? distribute-list [ACL_number] {in | out}
+  (config-router)#[no]? distribute-list prefix [PFL_name] {in | out}
+  (config-router)# default information originate {always | metric | metric-type | route-map}?
+
+  (config)# interface [interface]
+  (config-if)# {ip | ipv6} ospf [as_number] area [area_number]
+  (config-if)# {ip | ipv6} ospf cost [0-65,535]
+  (config-if)# {ip | ipv6} ospf {hello-interval | dead-interval} [seconds]
+  (config-if)# {ip | ipv6} ospf network {point-to-point | broadcast}
+
+  # clear {ip | ipv6} ospf process
+  ```
+
+- *OSPFv3*
+  ```
+  (config)# router ospfv3 [as_number]
+  (config-router)# address-family {ipv4 | ipv6} unicast
+  (config-router-af)# router-id [id]
+  (config-router-af)# [no]? passive-interface {default | [interface]}
+  (config-router-af)# auto-cost reference-bandwidth [10000] !!! 10Gbps
+  (config-router-af)# area [area_number] range [ABR_summary_prefix] [not-advertise]?
+  (config-router-af)# summary-prefix [ASBR_summary_prefix]
+  (config-router-af)# default-information originate
+
+  (config)# interface [interface]
+  (config-if)# ospfv3 [as_number] {ipv4 | ipv6} area [area_number]
+  (config-if)# ospfv3 [as_number] {ipv4 | ipv6} cost [0-65,535]
+  (config-if)# ospfv3 [as_number] {ipv4 | ipv6} {hello-interval | dead-interval} [seconds]
+  (config-if)# ospfv3 [as_number] {ipv4 | ipv6} network {point-to-point | broadcast}
+  ```
+
+Default information originate modes: 
+- Always 
+- Metric 
+
+
+### Troubleshooting
+
+#### Verification Commands (OSPFv3 & OSPFv2)
+```
+!!! Verify OSPF AS, networks & passive intefaces
+# show {ip | ipv6} protocols 
+
+!!! Verify OSPF adjacency 
+# show ospfv3 neighbor
+# show {ip | ipv6} neighbor
+
+!!! Verify OSPF  & timers in an interface
+# show ospfv3 interface [interface]
+# show {ip | ipv6} ospf interface [interface]
+
+!!! Displays all routes learned by OSPF
+# show ip route ospfv3
+# show {ip | ipv6} route ospf
+
+!!! Displays all OSPF routes and it´s LSA level
+# show ospfv3 database 
+# show {ip | ipv6} ospf database 
+
+!!! Verify Prefix-List statements
+# show ip prefix-list
+```
+
+## Miscellaneous Commands
 
 - *Infinite Ping*
   ```
-  # ping [ipv4] repeat 100000 size 1000
+  # ping [ipv4] repeat [100000] size 1000
   !!! Use [Ctrl + 6] to abort
   ```
+- *Infinite Traceroute*
+  ```
+  # traceroute [ipv4] probe [100000]
+  !!! Use [Ctrl + 6] to abort
+  ```
+
 - *Auth Keychain*
   ```
   !!! Display all keychains and keys store along with its valid dates
