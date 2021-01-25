@@ -26,7 +26,7 @@ The following are some key concepts that you should address when creating a reli
 - _Self-optimizing:_ Adapting to changing needs, beyond the limits of basic standards (prioritize the mission critical services).
 - _Self-aware:_ Driving change through insight into network activity by reporting insight traffic (tools as NetFlow, Network Based Application Recognition NBAR). Provides analytics in the user´s usage of the network.
 
-1. _Enterprise Campus:_ It consists in several network segments grouped into one building as a single network. Follows the 3-tier architecture:
+1. _Enterprise Campus:_ It consists in several network segments grouped into one or multiple buildings in a small geographical area as a single network. Follows the 3-tier architecture:
    - _Access Layer:_ Convergence wirless, voice and data. Grant user access to network devices, generally incorporates switched LAN devices to access the corporate network. Controls PoE, wired and wireless connection. It can be presented with routing capabilities or without it:
      - _(Bridging) L2 Only Access Layer:_ VLANs terminated at distribution layer and 50% of the entire links are blocked for STP. It´s a cheaper alternative.
      - _(Routing) L2 + L3 Access Layer:_ All access and distribution devices participate in routing. VLANs terminate at access layer, requires more planning in order to keep separated the traffic (internal from external or guest traffic).
