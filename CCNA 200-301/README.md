@@ -1015,33 +1015,33 @@ _It started when IPv4 became to run out of public addresses registered by the IA
 
 ## Static NAT
 
-_Maps **1-to-1 private and public addresses**. Usualy used for servers which must **accept incoming connections**._
+Maps **1-to-1 private and public addresses**. Usualy used for servers which must **accept incoming connections**.
 
 ```
-!!! Configure interface connected to the WAN (public address)
-(config)# interface {gigabit | ethernet} {0-X}/{0-X}
-(config-if)# ip nat outside
-
-!!! Configure interface connected to the LAN (private address)
-(config)# interface {gigabit | ethernet} {0-X}/{0-X}
+!!! Configure interface connected to the inside LAN (private address)
+(config)# interface [interface]
 (config-if)# ip nat inside
 
-!!! Map privat-public addresses
+!!! Configure interface connected to the outside WAN (public address)
+(config)# interface [interface]
+(config-if)# ip nat outside
+
+!!! Map private-public addresses
 (config)# ip nat inside source static [private_ip_address] [public_ip_address]
 ```
 
 ## Dynamic NAT
 
-_Uses a **pool of public addresses** (similar to DHCP). Is used for **hosts that needs to connect externally to the internet but not receiving incoming connections.** The addressing assignment is set as **FIFO**. The NAT pool must have enough addresses for all hosts in the inside LAN._
+Uses a **pool of public addresses** (similar to DHCP). Is used for **hosts that needs to connect externally to the internet but not receiving incoming connections.** The addressing assignment is set as **FIFO**. The NAT pool must have enough addresses for all hosts in the inside LAN. Iy uses a **connection tracking** which incoming packets from the outside are mapped to their local destinatinations by the port defined per device in the NAT overload table.
 
 ```
-!!! Configure interface connected to the WAN (public address)
-(config)# interface {gigabit | ethernet} {0-X}/{0-X}
-(config-if)# ip nat outside
-
-!!! Configure interface connected to the LAN (private address)
-(config)# interface {gigabit | ethernet} {0-X}/{0-X}
+!!! Configure interface connected to the inside LAN (private address)
+(config)# interface [interface]
 (config-if)# ip nat inside
+
+!!! Configure interface connected to the outside WAN (public address)
+(config)# interface [interface]
+(config-if)# ip nat outside
 
 !!! Set a NAT pool
 (config)# ip nat pool [nat_pool_name] [start_public_addresses] [end_public_addresses] netmask [netmask]
@@ -1055,7 +1055,42 @@ _Uses a **pool of public addresses** (similar to DHCP). Is used for **hosts that
 
 ## Port Address Translation (PAT)
 
-_Allows a **same public address to be re-used by many hosts**, the problem on Dynamic NAT is that we need the same amount (or more) public and private addreses. We can use a **dynamic pool** in which the **port number of the solicitant hosts will only be tracked once the pool reach the last available public address**. The same public address is used and the router know how to reach the host via it´s **unique port number**._
+Also known as NAT Overloading. Allows a **same public address to be re-used by many hosts**, the problem on Dynamic NAT is that we need the same amount (or more) public and private addreses. We can use a **dynamic pool** in which the **port number of the solicitant hosts will only be tracked once the pool reach the last available public address**. The same public address is used and the router know how to reach the host via it´s **unique port number**.
+
+```
+!!! Configure interface connected to the inside LAN (private address)
+(config)# interface [interface]
+(config-if)# ip nat inside
+
+!!! Configure interface connected to the outside WAN (public address)
+(config)# interface [interface]
+(config-if)# ip nat outside
+
+!!! Create an ACL for all INSIDE hosts that will be using PAT
+(config)# access-list [acl_number] permit [ip_matching_for_hosts] [wildcard]
+
+!!! Associate the ACL with the NAT pool
+(config)# ip nat inside source list [acl_number] interface [exit_interface] overload
+```
+
+## NAT Virtual Interface (NVI)
+
+The NVI **removes the necessity to declare inside/outside interfaces**. It is only present on **Cisco IOS v12.3** and above, and **routes one more time** (compared to the 3 traditional NAT modes). The process of NVI first routes the inside local address through the input interface, then it does the translation and finally the translated IP is routed (one more time) to the exit interface as the inside global address (route[in-if]->translate->routes again[out-if])
+
+```
+!!! Configure interface connected to the inside LAN (private address)
+(config)# interface [interface] !!! Entry interface from local network
+(config-if)# ip nat enable
+
+!!! Configure interface connected to the outside WAN (public address)
+(config)# interface [exit_interface] !!! Exit interface to outside network
+(config-if)# ip nat enable
+
+!!! Create an ACL for all INSIDE hosts that will be using NIV
+(config)# access-list [acl_number] permit [ipv4] [wildcard]
+
+(config)# ip nat source list [acl_number] interface [exit_interface] [overload]?
+```
 
 ### Well-known Public Address (NO DHCP)
 
@@ -1366,6 +1401,178 @@ _Define where the customer and provider areas of responsability are, and at what
 - **Private Cloud:** The **cloud infrastructure is provisioned for a single organization** (comprising multiple clients or business units). Most suitable for large companies because it represents an outweight initial effort and cost to setup infrastructure and automate workflows. The cloud can be provided by a third party or built in totally by the same user (ex. US Department on Defense Cloud mounted with AWS)
 - **Community Cloud:** Cloud infrastructure provided for exclusive use by a group of organization that share the same cloud requirements (mission, security, policy and comliance considerations). Least common deployment model, used in governments environments.
 - **Hybrid Cloud:** Combination on any cloud deployment infrastructures. Many clouds remain as unique entities but are bound together by standarized or propietary technologies that enables data and application portability. **Cloud bursting:** is the **usage of external cloud infrastructures to expand capabilities** (ex. if a private cloud demands more memory it can access the resources from a public cloud).
+
+## Virtualization
+
+The virtualization helps to **abstract physical resources** such as memory, CPU, network or storage from the services provided (applications), installing a **software-layer between the OS and server hardware (called Hypervisor)**. An Hypervisor is the combination of a lightweight OS to manage physiscal hardware and a software layer that manages the resources needed by every node or VM. _The most used hypervisor is **VMware ESXi (vSphere)**_.
+
+The network resources, when virtualized, split the physical NIC from the server (as many VMs needed) by giving each VM OS a **virtual Ethernet connection called Uplink**, in which forwarding traffic to the hypervisor network control, than can be seen as a virtual switch vSwitch which centralized all virtual network traffic (from vNIC) to the real server NIC card.
+
+The architecture of Network Virtualization has three main components:
+
+- **Access Control:** Where the authentication for end-users is granted/denied (VLAN or ACLs)
+- **Services Edge:** Where Policy Enforcement points are centralized, to control communications between logical partitions
+- **Path Isolation:** Independant logical traffic paths (called overlay) over a shared physical network like VPNs. Path Isolation can be archieve in **L2 by VLANs(802.1Q) single-hop** and in **L3(VRF, GRE & MPLS-VPN) multi-hop.**
+
+### Virtual Routing & Forwarding (VRF)
+
+Creates different virtual routers (different routing tables) in the same physical device. The **VRFs must also be mapped to the appropriate VLANs** at the edge of the network to provide continuous virtualization across the Layer 2 and Layer 3 portions of the network. A VRF has it´s own IP routing table (RIB), CEF FIB, and instance to process routing protocols with the CEs.
+
+VRF or VRF-Lite can be understand as a **L3 VLAN for routing advertisemnt propagations**, meaning that it can keep separated between groups the advertised networks from a dynamic routing protocol or a default route, preventing the other groups (other L3 VLANs) to install in their IP routing tables the networks learned and avoiding unauthorized access to them. _Note: Routing table from the main router can be changed by NOT showing some learned routes, that will be present in the associated VRF group routing table_
+
+- Allows for true routing and forwarding separation (different control & forwarding plane per vRouter)
+- Management and traffic troubleshooting simplified.
+- Supports different default routes (one per vRouter)
+
+```
+!!! Display all VRF groups with their belonging interfaces
+# show ip vrf
+
+!!! Display the configured IP address & link-state per interface in every VRF group
+# show ip vrf interfaces
+
+!!! Displays routing table from VRF group
+# show ip route vrf [vrf_name]
+# show ip route !!! Global routing table
+
+!!! Displays routing table from VRF group
+# show ip protocols vrf [vrf_name]
+# show ip protocols !!! Global routing protocols
+
+!!! Verify connectivity from VRF learned routes
+# ping vrf [vrf_name] [ipv4] [source]? [loopback_interface]?
+```
+
+_Before configuring VRF all dynamic routing protocols (OSPF, EIGRP, RIP, etc...) must be configured and be working correctly (should have desired connectivity)._
+
+```
+!!! Create the VRF group
+(config)# ip vrf [vrf_name]
+
+!!! Assign the physical interface that will be belonging to the VRF instance
+(config)# interface [interface]
+(config-if)# ip vrf forwarding [vrf_name]
+(config-if)# ip address [ipv4] [submask]
+(config-if)# no shut
+
+!!! Configure OSPF instances (existant only inside the VRF group)
+(config)# router ospf [as_number] vrf [vrf_name]
+(config-router)# router-id [router_id]
+(config-router)# network [ipv4] [wildcard] area [area_number]
+(config-router)# network [ipv4] [wildcard] area [area_number]
+```
+
+### Generic Routing Encapsulation (GRE)
+
+Tunneling protocol that supports IP, IPX, Apple Talk and multicast routing protocols. It is mounted ove **IP 47** with **no ecryption by default**, but can be used along with **IPsec** to provide authentication and data confidentiality across the tunneling (usually configured as hub-spoke topology). GRE is _stateless_ meaning that it does not include any flow control mechanisms, by default. GRE adds a _20-byte IP header_ and a _4-byte GRE header._
+
+```
+!!! Determine the link-state of the tunnel (up/down)
+# show ip interface brief tunnel [tunnel_id]
+
+!!! Verify the state of the GRE tunnel
+# show interface tunnel [tunnerl_id]
+
+!!! Validate the tunnel is seen as directly connected
+# show ip route
+```
+
+_Before configuring GRE all dynamic routing protocols (OSPF, EIGRP, RIP, etc...) must be configured and be working correctly (should have desired connectivity)._
+
+```
+!!! Configure GRE on both sides of the tunnel
+(config)# interface tunnel [tunnel_id]
+(config-if)# tunnel mode gre ip
+(config-if)# ip address [ipv4] [submask]
+
+!!! Note: Switch the IP from the exit interfaces respectively
+(config-if)# tunnel source [local_IPv4]
+(config-if)# tunnel destination [other_side_IPv4]
+```
+
+### VPNs & IP-Sec
+
+The VPNs (Virtual Private Networks) are used for enterprises to replace WAN connection to geograpically dispersed sites (branches inside the administrative network of the company) in the public network to lower the infrastructure cost, scales easily, **authenticate peers** and **cryptographic path protection**. A VPN connects securely a Site-A -> Site-B over an untrustworthy network.
+
+The 3 typical logical VPN topologies that are used in site-to-site VPNs are as follows:
+
+- **Point-to-point:** Simply connects securely a Site-A -> Site-B over an untrustworthy network
+- **Hub-and-spoke:** A central node (mostly a Data Center) interconnects all other sites (spokes)
+  - Tiered: The VPN acts as an Hub in one side and Spoke in the other side of the connection
+  - Joined: Combination of 2 or more topologies (hub-and-spoke, point-to-point, or full mesh)
+- **Meshed network**
+  - Full: Expensive and difficult to configure/manage to manage topology where all sites are interconnected by VPN
+  - Partial: Decrease the costs of full-mesh having high availability and interconnection in critical parts of the VPN, but in other sites of it it will have H&S or P2P
+
+#### IPSec VPNs
+
+IPSec provides security in network traffic (IP L4 & layers above only) by authentication, encrypting and sharing keys between a pair of pair of security gateways (hosts or each side from a VPN).
+
+IPSec combines 3 security protocols:
+
+- **IKE (Internet Key Exchange):** Is also called _ISAKMP_. Provides **key management and secure key sharing** for encryption algorithms (from Site-A -> Site-B in a VPN) also called **security association**. In order to generate & refresh the keys while the ISAKMP/IKE policy is active it must agree in the **HMAC**, a **Diffie-Hellman group (2 and 5 default)**, define the **encryption & authentication algorithms to use** and the encryption **keys valid time**.
+- **AH (Authentication Header):** **Authenticates** user traffic with **NO encryption** (obsolete and not supported on Cisco ASA)
+- **ESP (Encapsulating Security Payload):** **Authenticates** user traffic **with encryption** (that´s why is preferred over AH) to provide integrity, confidentiality and protection against replays.
+
+IP Sec Modes:
+
+- **Transparent Mode:** Encrypts only the payload (data)
+- **Tunnel Mode:** Encrypts the payload and the IP (and upper layers) headers.
+
+##### Dynamic Multipoint VPN (DMVPN)
+
+DMVPN does not require a permanent VPN connection between sites, uses a centralized architecture that simplifies deployment, communication between branches, lower costs (because works over the public WAN and ofers zero-touch configuration with IPsec).
+
+##### FlexVPN
+
+Similarly to DMVPN centralizes the VPN architecture **but offers the capability to manage different types of VPN types** (remote-access, teleworker, site-to-site, mobility, etc...). It offers **flexibility in transport layer** (deployed over public or private MPLS networks), third-party compatibility, IP Multicast support, QoS per tunnel, **centralized policy control** (encryption, VRF and DNS policies) peer AAA/RADIUS peer and it is VRF awarness through MPLS. It relies on **IKEv2** for key management.
+
+##### Virtual Tunnel Interfaces (VTI)
+
+Simplifies the configuration to site-to-site VPN tunnels. _Note: It is not recommended to use the same IP for the VTI as the physical interface because it leads to recursive routing and flapping tunnel on dynamic routing protocols_
+
+```
+!!! Verify IPSec packet count (send/received) through the tunnel
+# show crypto ipsec sa [detail]?
+
+!!! Verify VTI status (up/up). Otherwise review ALL the ISAKMP values, must match on both routers
+# show interface [tunnel0]
+
+!!! Validate that the default route to reach via the tunnel is on routing table
+# show ip route
+```
+
+```
+!!! Create an ISAKMP policy
+(config)# crypto isakmp policy [priority]
+(config-isakmp)# authentication pre-shared
+(config-isakmp)# hash {sha}
+(config-isakmp)# encryption aes 128
+(config-isakmp)# group [diffie_hellman_group]
+(config-isakmp)# lifetime [secs]
+
+!!! Generate a pre-shared key
+(config)# crypto isakmp key [password] address [tunnel_otherside_IPv4]
+
+!!! Define a crypto profile attatche to an encryption transform-set
+(config)# crypto ipsec transform-set [set_name] esp-aes 128 esp-sha-hmac
+(config)# crypto ipsec profile[crypto_profile_name]
+(ipsec-profile)# set transform-set [set_name]
+
+!!! Associate the crypto profile to a VTI
+(config)# interface [tunnel0] !!! Define tunnel ID
+(config-if)# description [description_message]
+(config-if)# ip unnumbered [tunnel_local_interface]
+(config-if)# tunnel source [tunnel_local_interface]
+(config-if)# tunnel destination [tunnel_otherside_IPv4]
+(config-if)# tunnel mode ipsec ipv4
+(config-if)# tunnel protection ipsec profile [crypto_profile_name]
+
+!!! Configure a default route associate to the VTI to route traffic
+(config)# ip route [network_to_reach_other_side] [netmask] [tunnel0]
+```
+
+_Note: Tthe tunnel allows only host from both sides to commuicate, meaning that a simple ping from the router will NO work. To verify connectivity this issue please enter `ping [ip] source [any_local_IP]` or try from a host_
 
 # **Wireless Networking**
 
