@@ -1574,90 +1574,6 @@ Simplifies the configuration to site-to-site VPN tunnels. _Note: It is not recom
 
 _Note: Tthe tunnel allows only host from both sides to commuicate, meaning that a simple ping from the router will NO work. To verify connectivity this issue please enter `ping [ip] source [any_local_IP]` or try from a host_
 
-# **Wireless Networking**
-
-_WiFi services are defined in the IEEE **802.11** standard._
-
-- **Ad-Hoc Networks:** 2 or more stations (wireless devices) communicate directly with each other. **Peer-to-peer** connection with no scalability pourposes. Also known as **Independent Basic Service Set IBSS**:
-  - **WPAN:** Wireless Personal Area Network. Devices are **<10 mts** like **Bluetooth**.
-- **Infrastructure Mode:** Stations (wireless devices) **communicacte via a centralized Wireless Access Point (AP)**:
-  - **WiFi Direct:** Operates connecting devices to an AP but also allow them to be part in a peer-to-peer communication. Doesn´t operate in Ad-Hoc IBSS mode even it can connect directly stations. It´s a WPAN derivation for infrastructure mode.
-  - **WMAN:** Wireless Metropolitan Area. Covers a large area such as a city.
-  - **WLAN:** Wireless Local Area Network. Provide access to a campus network (wired), without need for a cable. Devices are **<100 mts** of an **Access Point**.
-- **Mesh Networks:** One AP ratio (signal frequency, often 2.4 GHz) is used to serve clients and the other connects to the backhaul (traffic dedicated to connect network devices, 5 GHz). Poppular nowadays for home usage in dual-band supported devices.
-
-- **Wireless Bridges:** Connect wired network infrastructures to others wirelessly. Used for maintain connectivity between buildings where a cable is not possible.
-- **Wireless Access Point (AP)**:
-  - All AP speed is **Half-duplex**.
-  - Provides connectivity between wireless stations and the rest network (wired) via a **Distribution System (DS)** that connects the AP to the wired networks.
-  - Centralize access and control to the stations in an infrastructure mode, **the coverage area of this operations is called a Basic Service Area (BSA)**.
-  - All the devices in the same BSS must be identified by a **BSSID retreived from it´s MAC address**.
-  - All the coverage area from an AP, called **BSA or wireless cell**, is also **identified by one or multiple Service Set ID (SSID)**. Each SSID can have independant security settings and can be mapped to different VLANs.
-  - The AP **broadcast** its WLAN information and SSID requirements through **beacon frames**. Can be disabled.
-  - An **SSID can be replicated accross multiple AP** to give a **larger coverage area** through different frequency channels, known as **Extended Service Set (ESS)**
-
-_Wireless ISM Frequencies_
-
-- **2.4 GHz**: 802.11, 802.11b, 802.11g
-- **5.0 GHz**: 802.11a, 802.11ac
-- **2.4 & 5.0 GHz (dual-band)**: 802.11n
-
-_Wireless Security Standards_
-
-- **WEP**: Wireless Equivalent Privacy. RC4 Encryption.
-- **WPA**: WiFi Protected Access. RC4 & TKIP Encryption.
-  - **WPA Personal**: Uses pre-shared keys PSK´s
-  - **WPA Enterprise**: Uses a **RADIUS AAA** server with protocol **802.1X**
-- **WPA2**: AES & CCMP Encryption
-- **WPA3**: AES, CCMP & KRACK attack protection.
-
-## Wireless Lan Controller (WLC)
-
-_Used as a central point of management for several Access Points. The 2 possible modes an Access Point operates is **standalone (autonomous system)** or **lightweight (controlled by a WLC)** based in the OS image installed. The way an AP in lighweight mode connects to the WLC is set as a **zero-touch provisioning (ZTP)** where the AP discovers by **DHCP(option 43)/DNS** the IP connection to the WLC and when established the AP downdloads it´s configurations from it. A WLC functions are: **authentication**, **roaming control**, **802.11-802.3 communication**, **radio frequency**, **security** and **QoS management**_
-_The protocol used for WLCs to manage APs collections is the **Control And Provisioning of Wireless Access Points (CAPWAP)**. All WLC-AP communications are **encrypted inside DTLS CAPWAP tunnel** using **UDP ports 5246 & 5247**._
-
-1. Configure Switch -> WLC connection
-
-   ```
-   !!! Configure a DHCP for Access-Point addressing and connection to WLC
-   (config)# ip dhcp excluded-addresses [start_excluded] [end_excluded]
-   (config)# ip dhcp pool [pool_name]
-   (dhcp-config)# network [access_points_network] [netmask]
-   (dhcp-config)# default-router [management_svi_ipv4]
-   (dhcp-config)# option 43 ip [wlc_ipv4]
-
-   !!! Associate a VLAN + SVI for each SSID & the management of wireless devices
-   (config)# vlan [vlan_ID]
-   (config-vlan)# name [ssid_name]
-   (config-vlan)# exit
-   (config)# interface vlan [vlan_ID]
-   (config-if)# ip address [default_gateway_for_ssid_members] [netmask]
-
-   !!! Configure LAN Switch -> WLC link connection as TRUNK mode
-   (config)# interface {ethernet | gigabit} {0-X}/{0-X}
-   (config-if)# description [describe_link_2_WLC]
-   (config-if)# switchport trunk encapsulation dot1q
-   (config-if)# switchport mode trunk
-   (config-if)# switchport trunk allowed vlan [management_and_ssid_vlans]
-
-   !!! Configure LAN Switch -> each Access-Point
-   (config)# interface {ethernet | gigabit} {0-X}/{0-X}
-   (config-if)# description [describe_link_2_AP]
-   (config-if)# switchport mode access
-   (config-if)# switchport access vlan [ssid_vlan_ID]
-   (config-if)# spanning-tree portfast
-   ```
-
-2. Add any RADIUS AAA Server for WPA2 Enterprise authentication
-3. In WLC:
-   1. Create a DHCP pool for each SSID to addressing wireless hosts.
-   2. Associate a logical interface to each SSID
-   3. Link the WANs to their respectives logical interfaces, configuring AAA & security services
-4. Verify hosts connectivity to the A
-
-- **Standalone Access-Points**: _The link between the LAN switch & the Access-Point must be **trunk**, including all **SSID VLANs**._
-- **Lightweight/Managed Access Points**: _The link between the LAN switch & the Access-Point must be **trunk**, including all **SSID VLANs**. The link between LAN switch & the Access-Point must be **access** including only the **AP Management VLAN**. The lightweight Access Points can support some WLC **real-time operations** like **client handshake**, **beacon** announcement, **performance monitoring**, **encryption/decryption** and **communicate clients in power-safe mode** in order to facilitate WLC & network performance. The **Flex-Connect** protocol **enables an lightweight AP to communicate hosts in the same BSA without passing the traffic through the WLC** to improve the LAN response performance and velocity._
-
 # **Network Automation & Programmability**
 
 _The automation of networks through programmability is used for:_
@@ -1840,3 +1756,92 @@ Ambiguous command:
 (Unrecognized command)
 Invalid input detected at '^' marker
 .\*
+
+# **Wireless Networking**
+
+WiFi services are defined in the IEEE **802.11** standard.
+
+- Frequency
+- Wavelength
+- Amplitude
+- Free Path Loss
+- SNR
+
+**Antenna Types**
+
+- Omnidirectional:
+  - Dipole
+- Directional
+  - Yagi
+  - Patch
+  - Parabolic Dish
+
+## ISM Frequencies (Microwave Spectrum)
+
+- **2.4 GHz**: 802.11b, 802.11g
+- **5.0 GHz**: 802.11a, 802.11ac
+- **2.4 & 5.0 GHz (dual-band)**: 802.11n, 802.11ax(WiFi 6)
+
+MIMO (802.11n/ac):
+
+- MRC:
+- Beamforming:
+- Spatial Multiplexing:
+
+MU-MIMO(802.11ac):
+
+## Deployment Architectures
+
+### Autonomous (Standalone AP)
+
+Each AP is managed indepently with no interaction between APs. Used in **small environments at low costs**. The **communication that is NO in the same WVLAN (even if the clients are connected to the same AP device) must be routed through the wired network**, converting the traffic of 802.11 to 802.3. The only configuration available for autonomous AP is SSID, wireless security (basic) and power levels transimission.
+
+Some limitations of a standalone deployment are the manual configuration of each AP that are **prone to configuration inconsistencies**, **no rogue detection/mitigation** and **no dynamic RRM, FSR (Fast Secure Roaming)**.
+
+_**RRM:** Radio Resource Management. Is the dynamic allocation of a free WiFi channel, to prevent noise or interference by overlapping the same frequency._
+
+### WLC (Centralized)
+
+The Wireless LAN Controller (WLC) is the responsible of configuration, control plane and management of several APs. Eases the management of large networks and hierarchicaly control multiple APs. The WLC load balance the traffic when an AP becomes overloaded or in case of fault it adjust it based on the policies.
+
+The centralized architecture works with an **Split-MAC** mode where the **AP receives in real time the IP/MAC from a user** when trying to connect to the network, but it is the **WLC which handles and mantains the relation of clients and their connections (association and re-association)**.
+
+The communication between an AP and the WLC is enabled by the **CAPWAP (Control And Provisioning of Wireless Access Points)** that **enables every AP to discover an active controller in order to gather features** such as authentication, configuration, mobility and security by exchanging messages or statistics with the controller. _CAPWAP differentiates between data and control plane._ The CAPWAP messages between APs and the AP Manager (controller) are sent over **UDP 5247**. All the traffic is **routed by the WLC** even if 2 clients connected to the same AP want to communicate between them, but never needs to go back to the wired infrastructure unless the communication is trying to reach another WLC or VLAN different than the source (in that case the CAPWAP header is removed and the 802.3 frame gets routed)
+
+The benefits:
+
+- Centralized management and troubleshooting
+- RRM & High Availability
+- wIPS (roge detection & mitigation)
+- RADIUS and Cisco ISE authentication
+- Handles WLANs (to separate guest traffic)
+- Roaming (for voice and data)
+
+The limitations:
+
+- All traffic must be forwarded to WLC (even if 2 users connected to the same Ap want to communicate between them)
+- WLC can be bottlenecked (single point of failure)
+- Poor use of LAN/WAN resources
+
+### FlexConnect
+
+The **WLC resides in a central site** and it communicates to **many APs across a CAPWAP tunnel through the WAN**. It´s the most suitable solution for enterprises trying to connect many campuses (with branch guest access also called **WebAuth**) or are trying to **migrate from an autonomous (standalone) architecture**. The **Split-tunneling**, allows the FlexConnect APs to define how to react in the case of an unreachable connection to the cental site WLC for WAN failure or malfunction:
+
+- **Centralized Authorization:** The AP mantains existing sessions and handles all new client association for locally WLANs (but cannot authenticate users outside the WLANs which will be de-associated)
+- **Local Switching WLAN:** In WAN outage (no connection to WLC) the local traffic remains switching and AP works in Autonomous (standalone) mode. WLANs (but will no reach other WLANs because it needs the control plane from the WLC, disconnecting clients from other WLANs and making them unreachable)
+
+_Note: _
+
+### Cloud (Meraki & Catalyst 9800)
+
+Deploying a cloud means deploying a computer system, or a network of systems, from which computing resources are offered to remote users. Therefore, from a user perspective, the resources are transparently available, regardless of the user point of entry.
+
+IaaS: Delivers the infrastructure in a virtualized environment (network only)
+PaaS: Delivers a computing platform and stack (IaaS + OS)
+SaaS: Ready-to-use applications or software
+
+**Cisco Meraki Cloud-based:** AP devices automatically connect to the Cisco Meraki cloud over a secure link, register with their network and download their configuration. No WLC is needed and all policies can be implemented through a dashboard with zero-touch (easy implementation), BYOD support, automatic RF allocation for channels and analyticis from the network. The limitations of this system are that only Meraki devices can support it, is less flexible because it´s single architecture and limits the customization (compared to on-premises controll and cetrallized solutions). **No user data flows to the cloud controller** and no L3 roaming is supported.
+
+**Catalyst 9800:** The Cisco Catalyst 9800 are next-generation WLC build for intent-based networks, capable to virtualize their OS to run as a VM and being managed using Cisco DNA Center or NETConf/YANG in **SD-Access deploy model** used for **Centralized, FlexConnect and SD-Access (for private cloud)** or **FlexConnect only (for public cloud)** architectures.
+
+**Cisco Mobility Express:** Virtualized WLC integrated in a Cisco 802.11ac (Wave 2) AP running an Aironet CAPWAP image. The way it works is by having a Master AP which serves as WLC and AP at the same time, while manage other Subordinates APs in it's same VLAN. It´s an affordable and easy deployment method that supports L2 roaming, WPA2'PSK, WPA2'Enterprise(802.1X) and WLAN for guest traffic separation.
