@@ -496,13 +496,13 @@ Some limitations of GRE are that dynamic routing protocols (such as EIGRP, OSPF,
 (config-if)# ip address [vti_hub_ipv4] [submask]
 (config-if)# tunnel mode gre ip !!! Default mode
 (config-if)# tunnel source [interface_to_WAN]
-(config-if)# tunnel destination 192.0.2.3
+(config-if)# tunnel destination [hub_interface_to_WAN_ipv4]
 (config-if)# tunnel key [tunnel_key]
 (config-if)# ip nhrp network-id [nhrp_network_id]
 (config-if)# ip nhrp authentication [nhrp_key]
 (config-if)# ip nhrp nhs [vti_hub_ipv4]
-(config-if)# ip nhrp map multicast 192.0.2.3
-(config-if)# ip nhrp map [vti_hub_ipv4] 192.0.2.3
+(config-if)# ip nhrp map multicast [hub_interface_to_WAN_ipv4]
+(config-if)# ip nhrp map [vti_hub_ipv4] [hub_interface_to_WAN_ipv4]
 (config-if)# tunnel protection ipsec profile [ipsec_profile_name]
 (config-if)# ip address [vti_spoke_ipv4] [submask]
 (config-if)# ip mtu 1400
