@@ -274,58 +274,150 @@ _DHCP Operations (in-order of process)_
 
 #### DHCP Server
 
+##### **DHCPv4 Server (Static Binding)**
+
+Assigns the same IP to a host based on it´s MAC address (1-on-1) commonly used for servers. The IP address will always be assigned to one particular host.
+
 ```
-(config)# {ip | ipv6} dhcp excluded-addresses [start_ip_range_excluded] [end_ip_range_excluded]   !!! Not used for IPv6
-(config)# {ip | ipv6} dhcp pool [dhcp_pool_name]
-(config-dhcp)# network [dhcp_network_to_assign_addresses] [netmask]
-(config-dhcp)# default-router [default_gateway_ip_to_propagate]
-(config-dhcp)# dns-server [dns_server_ip_to_propagate]
-(config-dhcp)# lease [days] [hours] [minutes]
+# debug ip dhcp server packet
+
+(config)# ip dhcp pool [dhcp_pool_name]
+(dhcp-config)# host [host_ip_address] [netmask]
+(dhcp-config)# client-identifier [host_mac_address]
+
+# undebug all
 ```
 
-**Stateless Address Auto-Configuration (SLAAC)**
+```
+!!! DHCPv4 Client (Static Binding)
+(config)# interface [interface]
+(config-if)# ip address dhcp
+(config-if)?# ip dhcp client client-id ascii [client_id_text]
+```
 
-_By using SLAAC the **router advertise their interface IPv6 subnet (Global Unicast address)** to all hosts by ICMP and use it to assign them addressing. A **DHCPv6 is still required** because **SLAAC ONLY advertise the subnet**, **assign addresses** and **it´s default gateway** but **CAN´T setup a DNS server for hosts**. When a host is using SLAAC it will send all traffic through **:: (unespecify address)**. SLAAC doen´t use ARP, it uses simmilar packets known as **Neighbor Discovery (Solicitations & Advetisements) through ICMP**._
+##### **DHCPv4 Server (Dynamic Pool)**
+
+```
+(config)# ip dhcp excluded-addresses [start_ip_range_excluded] [end_ip_range_excluded]   !!! Not used for IPv6
+(config)# ip dhcp pool [dhcp_pool_name]
+(dhcp-config)# network [dhcp_network_to_assign_addresses] [netmask]
+(dhcp-config)# default-router [default_gateway_ip_to_propagate]
+(dhcp-config)# dns-server [dns_server_ip_to_propagate]
+(dhcp-config)# lease [days] [hours] [minutes]
+(dhcp-config)# domain-name [domain_name]
+(dhcp-config)# option {43 | 69 | 70 | 150} [server_ipv4] !!! WLC, SMTP, POP3, TFTP
+```
+
+```
+!!! DHCPv4 Client (Dynamic Binding)
+(config)# interface [interface]
+(config-if)# ip address dhcp
+
+# renew dhcp [interface]
+```
+
+##### **DHCPv6**
 
 _DHCPv6 represent a significant network security because it keeps track of IPv6-MAC addresses leased and because IPv6 is based on unicasting traffic an attacker can connect directly to a host. That´s why **the only reason to have DHCPv6 enable is for DNS acknowlegment** and we must **disable any possible IPv6 assignation from DHCP** converting all DHCP requests into **Stateless** to only conserve SLAAC IPv6_
 
+###### **Stateful DHCPv6**
+
 ```
-!!! Configure on the interface that connects (or is the nearest to) to LAN memebers (the DHCP clients)
-(config)# interface {gigabit | ethernet} {0-X}/{0-X}
-(config-if)# ipv6 dhcp server [dhcp_ipv6_pool_name]
+!!! Stateful Server
+(config)#ipv6 unicast-routing
 
-!!! STATEFUL: Defines the prefix to assign all new IPv6 addresses
-address prefix [ipv6_prefix]/[cidr]
+(config)# ipv6 dhcp pool [dhcp_pool_name]
+(config-dhcpv6)# address prefix [ipv6_prefix_with_cidr]
+(config-dhcpv6)# dns-server [dns_server]
+(config-dhcpv6)# domain-name [domain_name]
 
-!!! STATELESS: Doesn´t assigns IPv6 addresses, only dns-server, default-gateway & domain-name
+!!! Interface facing to host´s LAN
+(config)# interface [interface]
+(config-if)# ipv6 dhcp server [dhcp_pool_name]
+(config-if)?# ipv6 nd managed-config-flag
+
+# show ipv6 dhcp pool
+# show ipv6 dhcp binding
+```
+
+```
+!!! Stateful Client
+(config)#ipv6 unicast-routing
+
+(config)# interface [interface]
+(config-if)# ipv6 enable
+(config-if)# ipv6 address dhcp
+(config-if)# no shutdown
+
+# show ipv6 interface brief
+# show ipv6 dhcp interface [interface]
+```
+
+###### **Stateless DHCPv6**
+
+```
+!!! Stateless Server
+(config)#ipv6 unicast-routing
+
+(config)# ipv6 dhcp pool [dhcp_pool_name]
+(config-dhcpv6)# dns-server [dns_server]
+(config-dhcpv6)# domain-name [domain_name]
+
+!!! Interface facing to host´s LAN
+(config-if)# ipv6 enable
+(config-if)# ipv6 dhcp server [dhcp_pool_name]
 (config-if)# ipv6 nd other-config-flag
+
+# show ipv6 dhcp pool
+# show ipv6 dhcp binding
+```
+
+```
+!!! Stateless Client
+(config)#ipv6 unicast-routing
+
+(config)# interface [interface]
+(config-if)# ipv6 enable
+(config-if)# ipv6 address autoconfig
+(config-if)# no shutdown
+
+# show ipv6 interface brief
+# show ipv6 dhcp interface [interface]
+```
+
+###### **SLAAC DHCPv6**
+
+By using Stateless Address Auto-Configuration (SLAAC) the **router advertise their interface IPv6 subnet (Global Unicast address)** to all hosts by ICMP and use it to assign them addressing. A **DHCPv6 is still required** because **SLAAC ONLY advertise the subnet**, **assign addresses** and **it´s default gateway** but **CAN´T setup a DNS server for hosts**. When a host is using SLAAC it will send all traffic through **:: (unespecify address)**. SLAAC doen´t use ARP, it uses simmilar packets known as **Neighbor Discovery (Solicitations & Advetisements) through ICMP**.
+
+_Note: SLAAC uses the first IPv6 that finds in it`s same broadcast segment, you must be sure that at least one neighbor is currently using an IPv6 addressing reachable from the interface in order to auto-configure it_
+
+```
+(config)# ipv6 unicast-routing
+
+(config)# interface [interface]
+(config-if)# ipv6 enable
+(config-if)# ipv6 address autoconfig
+(config-if)# no shutdown
 ```
 
 #### DHCP Relay Agent
 
-_The **DHCP Discovery message (broadcast) is NOT forwarded for a router** if we have the DHCP server in other network. To enable DHCP communications and addressing response from one network to another we need to do the following configuration on any router in the middle of the client and server. If a **client is not reaching the DHCP server** it´ll have an **169.254.0.0** address._
+The **DHCP Discovery message (broadcast) is NOT forwarded for a router** if we have the DHCP server in other network. To enable DHCP communications and addressing response from one network to another we need to do the following configuration on any router in the middle of the client and server. If a **client is not reaching the DHCP server** it´ll have an **169.254.0.0** address.
+
+_Note: The relay configuration using the `ip helper-address` command, must be entered on the router interface that is facing the hosts LAN_
 
 ```
-!!! Router (non-DHCP server) interface connected to LAN (the default gateway for clients)
+!!! Router (non-DHCP server) interface connected to host´s LAN (the default gateway for clients)
 (config)# interface {gigabit | ethernet} {0-X}/{0-X}
 
 !!! DHCPv4
-(config-if)# ip helper-address [next_hop_IPv4_to_reach_dhcp_server]
+(config-if)# ip helper-address [next_hop_IP_to_reach_dhcp_server]
 
 !!! DHCPv6
 (config-if)# ipv6 dhcp relay destination [next_hop_IPv6_to_reach_dhcp_server] [exit_interface_to_DHCPv6_server]
-!!! USE ONLY when STATEFUL DHCP wants to be enable
-(config-if)# ipv6 nd managed-config-flag
+(config-if)# ipv6 nd managed-config-flag  !!! Needed when enableing STATEFUL DHCP only
 
 Note: For next-hop IP, use the opposite address in the point-to-point link between the relay router (configuring) and the one that is the DHCP server (the one that has the next-hop IP locally connected)
-```
-
-#### DHCP Client
-
-```
-!!! Configuration interface to dynamic addressing
-(config)# interface {gigabit | ethernet} {0-X}/{0-X}
-(config-if)# ip address dhcp
 ```
 
 ### Manually Assigned
